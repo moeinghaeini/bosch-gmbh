@@ -1,0 +1,38 @@
+{
+  "development": {
+    "database": {
+      "host": "localhost",
+      "port": 1433,
+      "name": "BoschThesisDb_Dev",
+      "user": "sa",
+      "password": "YourStrong@Passw0rd"
+    },
+    "api": {
+      "url": "http://localhost:5000",
+      "port": 5000
+    },
+    "frontend": {
+      "url": "http://localhost:3000",
+      "port": 3000,
+      "apiUrl": "http://localhost:5000/api"
+    }
+  },
+  "production": {
+    "database": {
+      "host": "sqlserver",
+      "port": 1433,
+      "name": "BoschThesisDb",
+      "user": "sa",
+      "password": "YourStrong@Passw0rd"
+    },
+    "api": {
+      "url": "http://backend:80",
+      "port": 80
+    },
+    "frontend": {
+      "url": "http://localhost:3000",
+      "port": 80,
+      "apiUrl": "http://backend:80/api"
+    }
+  }
+}

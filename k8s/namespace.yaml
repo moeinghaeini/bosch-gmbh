@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: industrial-automation
+  labels:
+    name: industrial-automation
+    environment: production

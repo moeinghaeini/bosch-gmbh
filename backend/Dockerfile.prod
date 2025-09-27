@@ -1,0 +1,76 @@
+# Bosch Industrial Automation Platform - Production Backend Dockerfile
+# Multi-stage build for optimized production image
+
+# =============================================
+# BUILD STAGE
+# =============================================
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Set working directory
+WORKDIR /src
+
+# Copy project files
+COPY BoschThesis.sln ./
+COPY BoschThesis.API/BoschThesis.API.csproj ./BoschThesis.API/
+COPY BoschThesis.Core/BoschThesis.Core.csproj ./BoschThesis.Core/
+COPY BoschThesis.Infrastructure/BoschThesis.Infrastructure.csproj ./BoschThesis.Infrastructure/
+
+# Restore dependencies
+RUN dotnet restore
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN dotnet build "BoschThesis.API/BoschThesis.API.csproj" -c Release -o /app/build
+
+# =============================================
+# PUBLISH STAGE
+# =============================================
+FROM build AS publish
+
+# Publish the application
+RUN dotnet publish "BoschThesis.API/BoschThesis.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# =============================================
+# RUNTIME STAGE
+# =============================================
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+
+# Install additional tools for production
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Set working directory
+WORKDIR /app
+
+# Copy published application
+COPY --from=publish /app/publish .
+
+# Create logs directory
+RUN mkdir -p /app/logs && chown -R appuser:appuser /app
+
+# Set permissions
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:80/health || exit 1
+
+# Set environment variables
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://+:80
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
+# Start the application
+ENTRYPOINT ["dotnet", "BoschThesis.API.dll"]
