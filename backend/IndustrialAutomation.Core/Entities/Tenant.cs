@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace IndustrialAutomation.Core.Entities;
 
 public class Tenant : BaseEntity
@@ -6,7 +8,14 @@ public class Tenant : BaseEntity
     public string Domain { get; set; } = string.Empty;
     public string Subdomain { get; set; } = string.Empty;
     public string ConnectionString { get; set; } = string.Empty;
-    public TenantSettings Settings { get; set; } = new();
+    public string SettingsJson { get; set; } = "{}";
+    
+    [NotMapped]
+    public TenantSettings Settings 
+    { 
+        get => System.Text.Json.JsonSerializer.Deserialize<TenantSettings>(SettingsJson) ?? new TenantSettings();
+        set => SettingsJson = System.Text.Json.JsonSerializer.Serialize(value);
+    }
     public bool IsActive { get; set; } = true;
     public DateTime SubscriptionExpiresAt { get; set; }
     public string SubscriptionPlan { get; set; } = "Basic";
@@ -38,7 +47,14 @@ public class TenantUser : BaseEntity
     public bool IsActive { get; set; } = true;
     public DateTime JoinedAt { get; set; }
     public DateTime? LastAccessAt { get; set; }
-    public TenantUserPermissions Permissions { get; set; } = new();
+    public string PermissionsJson { get; set; } = "{}";
+    
+    [NotMapped]
+    public TenantUserPermissions Permissions 
+    { 
+        get => System.Text.Json.JsonSerializer.Deserialize<TenantUserPermissions>(PermissionsJson) ?? new TenantUserPermissions();
+        set => PermissionsJson = System.Text.Json.JsonSerializer.Serialize(value);
+    }
 }
 
 public class TenantUserPermissions
@@ -59,7 +75,14 @@ public class TenantResource : BaseEntity
     public string ResourceType { get; set; } = string.Empty;
     public string ResourceName { get; set; } = string.Empty;
     public string ResourceId { get; set; } = string.Empty;
-    public Dictionary<string, object> Metadata { get; set; } = new();
+    public string MetadataJson { get; set; } = "{}";
+    
+    [NotMapped]
+    public Dictionary<string, object> Metadata 
+    { 
+        get => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(MetadataJson) ?? new Dictionary<string, object>();
+        set => MetadataJson = System.Text.Json.JsonSerializer.Serialize(value);
+    }
     public bool IsActive { get; set; } = true;
     public DateTime LastAccessedAt { get; set; }
 }

@@ -28,7 +28,7 @@ public static class TestConfiguration
         // Add services
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IMonitoringService, MonitoringService>();
-        services.AddScoped<IAIService, OpenAIService>();
+        services.AddScoped<IAIService, AIService>();
 
         // Add logging
         services.AddLogging(builder => builder.AddConsole());

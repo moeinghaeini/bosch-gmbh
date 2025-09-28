@@ -399,14 +399,18 @@ public class AuthService : IAuthService
             var permissions = new List<string>();
 
             // Add role-based permissions
-            foreach (var userRole in user.UserRoles)
+            if (!string.IsNullOrEmpty(user.UserRoles))
             {
-                var role = await _context.UserRoles.FindAsync(userRole.RoleId);
-                if (role?.Permissions != null)
+                var roleIds = user.UserRoles.Split(',').Select(int.Parse).ToList();
+                foreach (var roleId in roleIds)
                 {
-                    // Parse JSON permissions
-                    var rolePermissions = System.Text.Json.JsonSerializer.Deserialize<List<string>>(role.Permissions) ?? new List<string>();
-                    permissions.AddRange(rolePermissions);
+                    var role = await _context.UserRoles.FindAsync(roleId);
+                    if (role?.Permissions != null)
+                    {
+                        // Parse JSON permissions
+                        var rolePermissions = System.Text.Json.JsonSerializer.Deserialize<List<string>>(role.Permissions) ?? new List<string>();
+                        permissions.AddRange(rolePermissions);
+                    }
                 }
             }
 
@@ -442,7 +446,7 @@ public class AuthService : IAuthService
         if (user == null)
             return false;
 
-        return user.Role == role || user.UserRoles.Any(ur => ur.UserRoleName == role);
+        return user.Role == role || (!string.IsNullOrEmpty(user.UserRoles) && user.UserRoles.Contains(role));
     }
 
     private string GenerateJwtToken(User user)

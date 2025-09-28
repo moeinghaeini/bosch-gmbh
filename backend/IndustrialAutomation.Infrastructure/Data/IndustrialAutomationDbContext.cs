@@ -24,9 +24,9 @@ public class IndustrialAutomationDbContext : DbContext
         public DbSet<PerformanceMetric> PerformanceMetrics { get; set; }
         public DbSet<SystemLog> SystemLogs { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
-        public DbSet<Tenant> Tenants { get; set; }
-        public DbSet<TenantUser> TenantUsers { get; set; }
-        public DbSet<TenantResource> TenantResources { get; set; }
+        // public DbSet<Tenant> Tenants { get; set; }
+        // public DbSet<TenantUser> TenantUsers { get; set; }
+        // public DbSet<TenantResource> TenantResources { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,6 +48,15 @@ public class IndustrialAutomationDbContext : DbContext
             entity.Property(e => e.ScheduledAt).IsRequired(false);
             entity.Property(e => e.StartedAt).IsRequired(false);
             entity.Property(e => e.CompletedAt).IsRequired(false);
+            entity.Property(e => e.RetryCount).IsRequired();
+            entity.Property(e => e.MaxRetries).IsRequired();
+            entity.Property(e => e.Priority).IsRequired();
+            
+            // Performance indexes
+            entity.HasIndex(e => e.StatusId).HasDatabaseName("IX_AutomationJobs_StatusId");
+            entity.HasIndex(e => e.JobTypeId).HasDatabaseName("IX_AutomationJobs_JobTypeId");
+            entity.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_AutomationJobs_CreatedAt");
+            entity.HasIndex(e => new { e.StatusId, e.JobTypeId }).HasDatabaseName("IX_AutomationJobs_StatusId_JobTypeId");
         });
 
         // Configure User
@@ -149,6 +158,173 @@ public class IndustrialAutomationDbContext : DbContext
             entity.HasIndex(e => e.NextRunTime).HasDatabaseName("IX_JobSchedules_NextRunTime");
             entity.HasIndex(e => new { e.StatusId, e.IsEnabled }).HasDatabaseName("IX_JobSchedules_StatusId_Enabled");
         });
+
+        // Configure MLModel
+        modelBuilder.Entity<MLModel>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.ModelType).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Version).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.FilePath).HasMaxLength(500);
+            entity.Property(e => e.Configuration).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.TrainingData).HasMaxLength(500);
+            entity.Property(e => e.CreatedBy).HasMaxLength(100);
+            entity.Property(e => e.Tags).HasMaxLength(200);
+            
+            // Performance indexes
+            entity.HasIndex(e => e.Name).HasDatabaseName("IX_MLModels_Name");
+            entity.HasIndex(e => e.Status).HasDatabaseName("IX_MLModels_Status");
+            entity.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_MLModels_CreatedAt");
+        });
+
+        // Configure AITrainingData
+        modelBuilder.Entity<AITrainingData>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.DataType).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.DataContent).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.Metadata).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.QualityScore).IsRequired();
+            entity.Property(e => e.CreatedBy).HasMaxLength(100);
+            
+            // Performance indexes
+            entity.HasIndex(e => e.DataType).HasDatabaseName("IX_AITrainingData_DataType");
+            entity.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_AITrainingData_CreatedAt");
+        });
+
+        // Configure UserRole
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.RoleName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Permissions).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.AllowedModules).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.AllowedActions).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.Restrictions).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.ModifiedBy).HasMaxLength(100);
+            
+            // Performance indexes
+            entity.HasIndex(e => e.RoleName).HasDatabaseName("IX_UserRoles_RoleName");
+            entity.HasIndex(e => e.IsActive).HasDatabaseName("IX_UserRoles_IsActive");
+        });
+
+        // Configure UserPermission
+        modelBuilder.Entity<UserPermission>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PermissionType).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Resource).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.GrantedBy).HasMaxLength(100);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            
+            // Performance indexes
+            entity.HasIndex(e => e.UserId).HasDatabaseName("IX_UserPermissions_UserId");
+            entity.HasIndex(e => e.RoleId).HasDatabaseName("IX_UserPermissions_RoleId");
+            entity.HasIndex(e => e.PermissionType).HasDatabaseName("IX_UserPermissions_PermissionType");
+        });
+
+        // Configure PerformanceMetric
+        modelBuilder.Entity<PerformanceMetric>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.MetricName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Tags).HasColumnType("nvarchar(max)");
+            
+            // Performance indexes
+            entity.HasIndex(e => e.MetricName).HasDatabaseName("IX_PerformanceMetrics_MetricName");
+            entity.HasIndex(e => e.Category).HasDatabaseName("IX_PerformanceMetrics_Category");
+            entity.HasIndex(e => e.Timestamp).HasDatabaseName("IX_PerformanceMetrics_Timestamp");
+        });
+
+        // Configure SystemLog
+        modelBuilder.Entity<SystemLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Level).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Message).IsRequired().HasColumnType("nvarchar(max)");
+            entity.Property(e => e.Exception).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.Properties).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.Source).HasMaxLength(200);
+            
+            // Performance indexes
+            entity.HasIndex(e => e.Level).HasDatabaseName("IX_SystemLogs_Level");
+            entity.HasIndex(e => e.Source).HasDatabaseName("IX_SystemLogs_Source");
+            entity.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_SystemLogs_CreatedAt");
+        });
+
+        // Configure AuditLog
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.RequestId).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.UserId).HasMaxLength(100);
+            entity.Property(e => e.UserRole).HasMaxLength(50);
+            entity.Property(e => e.Method).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.Path).HasMaxLength(500);
+            entity.Property(e => e.QueryString).HasMaxLength(1000);
+            entity.Property(e => e.RequestBody).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.UserAgent).HasMaxLength(500);
+            entity.Property(e => e.IpAddress).HasMaxLength(45);
+            entity.Property(e => e.Exception).HasColumnType("nvarchar(max)");
+            
+            // Performance indexes
+            entity.HasIndex(e => e.RequestId).HasDatabaseName("IX_AuditLogs_RequestId");
+            entity.HasIndex(e => e.UserId).HasDatabaseName("IX_AuditLogs_UserId");
+            entity.HasIndex(e => e.CreatedAt).HasDatabaseName("IX_AuditLogs_CreatedAt");
+            entity.HasIndex(e => e.StatusCode).HasDatabaseName("IX_AuditLogs_StatusCode");
+        });
+
+        // Configure Tenant (temporarily disabled)
+        // modelBuilder.Entity<Tenant>(entity =>
+        // {
+        //     entity.HasKey(e => e.Id);
+        //     entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+        //     entity.Property(e => e.Domain).IsRequired().HasMaxLength(200);
+        //     entity.Property(e => e.Subdomain).IsRequired().HasMaxLength(100);
+        //     entity.Property(e => e.ConnectionString).HasMaxLength(1000);
+        //     entity.Property(e => e.SettingsJson).HasColumnType("nvarchar(max)");
+        //     entity.Property(e => e.SubscriptionPlan).IsRequired().HasMaxLength(100);
+        //     entity.Property(e => e.CustomBranding).HasColumnType("nvarchar(max)");
+        //     entity.Property(e => e.CustomDomain).HasMaxLength(200);
+        //     
+        //     // Performance indexes
+        //     entity.HasIndex(e => e.Domain).IsUnique().HasDatabaseName("IX_Tenants_Domain");
+        //     entity.HasIndex(e => e.Subdomain).IsUnique().HasDatabaseName("IX_Tenants_Subdomain");
+        //     entity.HasIndex(e => e.IsActive).HasDatabaseName("IX_Tenants_IsActive");
+        // });
+
+        // Configure TenantUser (temporarily disabled)
+        // modelBuilder.Entity<TenantUser>(entity =>
+        // {
+        //     entity.HasKey(e => e.Id);
+        //     entity.Property(e => e.Role).IsRequired().HasMaxLength(50);
+        //     entity.Property(e => e.PermissionsJson).HasColumnType("nvarchar(max)");
+        //     
+        //     // Performance indexes
+        //     entity.HasIndex(e => e.TenantId).HasDatabaseName("IX_TenantUsers_TenantId");
+        //     entity.HasIndex(e => e.UserId).HasDatabaseName("IX_TenantUsers_UserId");
+        //     entity.HasIndex(e => e.IsActive).HasDatabaseName("IX_TenantUsers_IsActive");
+        // });
+
+        // Configure TenantResource (temporarily disabled)
+        // modelBuilder.Entity<TenantResource>(entity =>
+        // {
+        //     entity.HasKey(e => e.Id);
+        //     entity.Property(e => e.ResourceType).IsRequired().HasMaxLength(100);
+        //     entity.Property(e => e.ResourceName).IsRequired().HasMaxLength(200);
+        //     entity.Property(e => e.ResourceId).IsRequired().HasMaxLength(200);
+        //     entity.Property(e => e.MetadataJson).HasColumnType("nvarchar(max)");
+        //     
+        //     // Performance indexes
+        //     entity.HasIndex(e => e.TenantId).HasDatabaseName("IX_TenantResources_TenantId");
+        //     entity.HasIndex(e => e.ResourceType).HasDatabaseName("IX_TenantResources_ResourceType");
+        //     entity.HasIndex(e => e.IsActive).HasDatabaseName("IX_TenantResources_IsActive");
+        // });
 
         // Seed data
         SeedData(modelBuilder);

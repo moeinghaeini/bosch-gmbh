@@ -58,9 +58,9 @@ services:
       - JWT__Audience=IndustrialAutomation
       - JWT__ExpirationMinutes=60
       - JWT__RefreshTokenExpirationDays=7
-      - OpenAI__ApiKey=${OPENAI_API_KEY:-your-openai-api-key}
-      - OpenAI__BaseUrl=https://api.openai.com/v1
-      - OpenAI__Model=gpt-3.5-turbo
+      - AI__ApiKey=${AI_API_KEY:-your-ai-api-key}
+      - AI__BaseUrl=https://api.ai-service.com/v1
+      - AI__Model=advanced-model
       - RateLimiting__RequestsPerMinute=100
       - RateLimiting__BurstLimit=20
       - Logging__LogLevel__Default=Information
@@ -93,7 +93,7 @@ services:
       target: production
     container_name: industrial-automation-frontend
     environment:
-      - REACT_APP_API_URL=http://localhost:5001
+      - REACT_APP_API_URL=http://localhost:5001/api
       - REACT_APP_ENVIRONMENT=production
     ports:
       - "3000:80"

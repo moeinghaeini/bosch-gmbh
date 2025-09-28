@@ -6,23 +6,23 @@ using System.Text.Json;
 
 namespace IndustrialAutomation.Infrastructure.Services;
 
-public class OpenAIService : IAIService
+public class AIService : IAIService
 {
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
-    private readonly ILogger<OpenAIService> _logger;
+    private readonly ILogger<AIService> _logger;
     private readonly string _apiKey;
     private readonly string _baseUrl;
     private readonly string _model;
 
-    public OpenAIService(HttpClient httpClient, IConfiguration configuration, ILogger<OpenAIService> logger)
+    public AIService(HttpClient httpClient, IConfiguration configuration, ILogger<AIService> logger)
     {
         _httpClient = httpClient;
         _configuration = configuration;
         _logger = logger;
-        _apiKey = _configuration["OpenAI:ApiKey"] ?? throw new InvalidOperationException("OpenAI API Key not configured");
-        _baseUrl = _configuration["OpenAI:BaseUrl"] ?? "https://api.openai.com/v1";
-        _model = _configuration["OpenAI:Model"] ?? "gpt-4";
+        _apiKey = _configuration["AI:ApiKey"] ?? throw new InvalidOperationException("AI API Key not configured");
+        _baseUrl = _configuration["AI:BaseUrl"] ?? "https://api.ai-service.com/v1";
+        _model = _configuration["AI:Model"] ?? "advanced-model";
         
         _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
     }
@@ -48,7 +48,7 @@ public class OpenAIService : IAIService
                 Format your response as a structured JSON object with clear sections.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -87,7 +87,7 @@ public class OpenAIService : IAIService
                 Format as a structured JSON response.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -119,7 +119,7 @@ public class OpenAIService : IAIService
                 Format as a structured JSON response.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -150,7 +150,7 @@ public class OpenAIService : IAIService
                 Format as a structured JSON response with probabilities and recommendations.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -187,7 +187,7 @@ public class OpenAIService : IAIService
                 Return as a structured list of classifications.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).ToList();
         }
         catch (Exception ex)
@@ -225,7 +225,7 @@ public class OpenAIService : IAIService
                 Return as a JSON object with probability scores.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             var predictions = new Dictionary<string, double>();
             
             try
@@ -296,7 +296,7 @@ public class OpenAIService : IAIService
                 Return as a structured list of clusters.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).ToList();
         }
         catch (Exception ex)
@@ -335,7 +335,7 @@ public class OpenAIService : IAIService
                 Format as a structured analysis report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -365,7 +365,7 @@ public class OpenAIService : IAIService
                 Format as a detailed technical analysis.
             ";
 
-            return await CallOpenAIAsync(aiPrompt);
+            return await CallAIAsync(aiPrompt);
         }
         catch (Exception ex)
         {
@@ -396,7 +396,7 @@ public class OpenAIService : IAIService
                 Format as a structured element identification report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -428,7 +428,7 @@ public class OpenAIService : IAIService
                 Format as a structured selector guide.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -459,7 +459,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive validation report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -490,7 +490,7 @@ public class OpenAIService : IAIService
                 Format as a structured data extraction report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -521,7 +521,7 @@ public class OpenAIService : IAIService
                 Format as a production-ready automation script.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -553,7 +553,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive results analysis report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -586,7 +586,7 @@ public class OpenAIService : IAIService
                 Format as a detailed optimization plan.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -616,7 +616,7 @@ public class OpenAIService : IAIService
                 Format as a structured element extraction report.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "elements", result } };
         }
         catch (Exception ex)
@@ -653,7 +653,7 @@ public class OpenAIService : IAIService
                 Format as a structured element recognition report.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).ToList();
         }
         catch (Exception ex)
@@ -684,7 +684,7 @@ public class OpenAIService : IAIService
                 Format as a structured command processing report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -713,7 +713,7 @@ public class OpenAIService : IAIService
                 Format as a structured intent parsing report.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "intent", result } };
         }
         catch (Exception ex)
@@ -743,7 +743,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive action plan.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -778,7 +778,7 @@ public class OpenAIService : IAIService
                 Format as a structured entity extraction report.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).ToList();
         }
         catch (Exception ex)
@@ -808,7 +808,7 @@ public class OpenAIService : IAIService
                 Format as a detailed action translation report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -840,7 +840,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive training report.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.Contains("success") || result.Contains("completed") || result.Contains("ready");
         }
         catch (Exception ex)
@@ -872,7 +872,7 @@ public class OpenAIService : IAIService
                 Return numerical scores and detailed analysis.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             
             // Extract accuracy score from result
             var lines = result.Split('\n');
@@ -916,7 +916,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive deployment report.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.Contains("deployed") || result.Contains("success") || result.Contains("ready");
         }
         catch (Exception ex)
@@ -946,7 +946,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive metrics dashboard.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "metrics", result } };
         }
         catch (Exception ex)
@@ -976,7 +976,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive model catalog.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).ToList();
         }
         catch (Exception ex)
@@ -1007,7 +1007,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive visual analysis report.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "analysis", result } };
         }
         catch (Exception ex)
@@ -1044,7 +1044,7 @@ public class OpenAIService : IAIService
                 Format as a structured element detection report.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new List<Dictionary<string, object>> { new Dictionary<string, object> { { "elements", result } } };
         }
         catch (Exception ex)
@@ -1074,7 +1074,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive text extraction report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -1103,7 +1103,7 @@ public class OpenAIService : IAIService
                 Format as a comprehensive image comparison report.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "comparison", result } };
         }
         catch (Exception ex)
@@ -1131,7 +1131,7 @@ public class OpenAIService : IAIService
                 Return as JSON array of button objects.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new List<Dictionary<string, object>> { new Dictionary<string, object> { { "buttons", result } } };
         }
         catch (Exception ex)
@@ -1158,7 +1158,7 @@ public class OpenAIService : IAIService
                 Return as JSON array of input field objects.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new List<Dictionary<string, object>> { new Dictionary<string, object> { { "inputFields", result } } };
         }
         catch (Exception ex)
@@ -1185,7 +1185,7 @@ public class OpenAIService : IAIService
                 Return as JSON array of link objects.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new List<Dictionary<string, object>> { new Dictionary<string, object> { { "links", result } } };
         }
         catch (Exception ex)
@@ -1213,7 +1213,7 @@ public class OpenAIService : IAIService
                 Return analysis in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "analysis", result } };
         }
         catch (Exception ex)
@@ -1240,7 +1240,7 @@ public class OpenAIService : IAIService
                 Return as JSON with selector options.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -1266,7 +1266,7 @@ public class OpenAIService : IAIService
                 Return true/false with reasoning.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.ToLower().Contains("true");
         }
         catch (Exception ex)
@@ -1293,7 +1293,7 @@ public class OpenAIService : IAIService
                 Return as JSON object.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "attributes", result } };
         }
         catch (Exception ex)
@@ -1323,7 +1323,7 @@ public class OpenAIService : IAIService
                 Return comprehensive analysis report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -1350,7 +1350,7 @@ public class OpenAIService : IAIService
                 Return analysis in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "analysis", result } };
         }
         catch (Exception ex)
@@ -1378,7 +1378,7 @@ public class OpenAIService : IAIService
                 Return analysis in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "analysis", result } };
         }
         catch (Exception ex)
@@ -1406,7 +1406,7 @@ public class OpenAIService : IAIService
                 Return comprehensive statistical report in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "report", result } };
         }
         catch (Exception ex)
@@ -1434,7 +1434,7 @@ public class OpenAIService : IAIService
                 Return comparison results in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new List<Dictionary<string, object>> { new Dictionary<string, object> { { "comparison", result } } };
         }
         catch (Exception ex)
@@ -1462,7 +1462,7 @@ public class OpenAIService : IAIService
                 Return KPI analysis in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "kpis", result } };
         }
         catch (Exception ex)
@@ -1490,7 +1490,7 @@ public class OpenAIService : IAIService
                 Return comprehensive performance report.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -1517,7 +1517,7 @@ public class OpenAIService : IAIService
                 Return failure analysis in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "analysis", result } };
         }
         catch (Exception ex)
@@ -1545,7 +1545,7 @@ public class OpenAIService : IAIService
                 Return predictions in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "predictions", result } };
         }
         catch (Exception ex)
@@ -1573,7 +1573,7 @@ public class OpenAIService : IAIService
                 Return actionable recommendations.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -1603,7 +1603,7 @@ public class OpenAIService : IAIService
                 Return training status and results.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.ToLower().Contains("success");
         }
         catch (Exception ex)
@@ -1632,7 +1632,7 @@ public class OpenAIService : IAIService
                 Return evaluation results in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "evaluation", result } };
         }
         catch (Exception ex)
@@ -1661,7 +1661,7 @@ public class OpenAIService : IAIService
                 Return deployment status.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.ToLower().Contains("deployed");
         }
         catch (Exception ex)
@@ -1688,7 +1688,7 @@ public class OpenAIService : IAIService
                 Return metrics in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "metrics", result } };
         }
         catch (Exception ex)
@@ -1715,7 +1715,7 @@ public class OpenAIService : IAIService
                 Return version information.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new List<string> { result };
         }
         catch (Exception ex)
@@ -1744,7 +1744,7 @@ public class OpenAIService : IAIService
                 Return rollback status.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return result.ToLower().Contains("success");
         }
         catch (Exception ex)
@@ -1774,7 +1774,7 @@ public class OpenAIService : IAIService
                 Return comparison in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "comparison", result } };
         }
         catch (Exception ex)
@@ -1801,7 +1801,7 @@ public class OpenAIService : IAIService
                 Return comprehensive documentation.
             ";
 
-            return await CallOpenAIAsync(prompt);
+            return await CallAIAsync(prompt);
         }
         catch (Exception ex)
         {
@@ -1828,7 +1828,7 @@ public class OpenAIService : IAIService
                 Return drift analysis in JSON format.
             ";
 
-            var result = await CallOpenAIAsync(prompt);
+            var result = await CallAIAsync(prompt);
             return new Dictionary<string, object> { { "drift_analysis", result } };
         }
         catch (Exception ex)
@@ -1838,7 +1838,7 @@ public class OpenAIService : IAIService
         }
     }
 
-    private async Task<string> CallOpenAIAsync(string prompt)
+    private async Task<string> CallAIAsync(string prompt)
     {
         try
         {
@@ -1847,7 +1847,7 @@ public class OpenAIService : IAIService
                 model = _model,
                 messages = new[]
                 {
-                    new { role = "system", content = "You are an expert AI assistant specializing in industrial automation, test execution, and web automation. Provide detailed, technical, and actionable responses." },
+                    new { role = "system", content = "You are an expert system specializing in industrial automation, test execution, and web automation. Provide detailed, technical, and actionable responses." },
                     new { role = "user", content = prompt }
                 },
                 max_tokens = 2000,
@@ -1865,34 +1865,34 @@ public class OpenAIService : IAIService
 
             if (response.IsSuccessStatusCode)
             {
-                var openAIResponse = JsonSerializer.Deserialize<OpenAIResponse>(result);
-                return openAIResponse?.Choices?.FirstOrDefault()?.Message?.Content ?? "No response from AI";
+                var aiResponse = JsonSerializer.Deserialize<AIResponse>(result);
+                return aiResponse?.Choices?.FirstOrDefault()?.Message?.Content ?? "No response from AI";
             }
             else
             {
-                _logger.LogWarning("OpenAI API returned error: {StatusCode} - {Content}", response.StatusCode, result);
+                _logger.LogWarning("AI API returned error: {StatusCode} - {Content}", response.StatusCode, result);
                 return "AI service temporarily unavailable";
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calling OpenAI API");
+            _logger.LogError(ex, "Error calling AI API");
             return "AI service error: " + ex.Message;
         }
     }
 }
 
-public class OpenAIResponse
+public class AIResponse
 {
-    public List<OpenAIChoice>? Choices { get; set; }
+    public List<AIChoice>? Choices { get; set; }
 }
 
-public class OpenAIChoice
+public class AIChoice
 {
-    public OpenAIMessage? Message { get; set; }
+    public AIMessage? Message { get; set; }
 }
 
-public class OpenAIMessage
+public class AIMessage
 {
     public string? Content { get; set; }
 }

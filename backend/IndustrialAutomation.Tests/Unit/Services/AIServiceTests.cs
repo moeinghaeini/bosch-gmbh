@@ -8,16 +8,16 @@ using AutoFixture;
 
 namespace IndustrialAutomation.Tests.Unit.Services;
 
-public class OpenAIServiceTests
+public class AIServiceTests
 {
-    private readonly Mock<ILogger<OpenAIService>> _mockLogger;
-    private readonly OpenAIService _service;
+    private readonly Mock<ILogger<AIService>> _mockLogger;
+    private readonly AIService _service;
     private readonly IFixture _fixture;
 
-    public OpenAIServiceTests()
+    public AIServiceTests()
     {
-        _mockLogger = new Mock<ILogger<OpenAIService>>();
-        _service = new OpenAIService(_mockLogger.Object);
+        _mockLogger = new Mock<ILogger<AIService>>();
+        _service = new AIService(_mockLogger.Object);
         _fixture = new Fixture();
     }
 

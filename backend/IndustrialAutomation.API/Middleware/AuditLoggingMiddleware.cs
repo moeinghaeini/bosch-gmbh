@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using IndustrialAutomation.Infrastructure.Data;
+using IndustrialAutomation.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace IndustrialAutomation.API.Middleware;

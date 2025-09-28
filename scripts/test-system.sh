@@ -244,7 +244,7 @@ echo "=========================="
 
 run_test "AI Service Health" "curl -f -s http://localhost:5001/api/testexecutions/analyze -X POST -H 'Content-Type: application/json' -d '{\"testResults\":\"test data\"}' | grep -q 'analysis' || echo 'AI service responding'"
 
-run_test "OpenAI Integration" "docker-compose exec -T backend dotnet test --filter Category=AI --no-build --verbosity quiet"
+run_test "AI Integration" "docker-compose exec -T backend dotnet test --filter Category=AI --no-build --verbosity quiet"
 
 # =============================================
 # FINAL RESULTS

@@ -11,62 +11,62 @@ const api = axios.create({
 
 // Automation Jobs API
 export const getAutomationJobs = async () => {
-  const response = await api.get('/automationjobs');
+  const response = await api.get('/workingcrud/automationjobs');
   return response.data;
 };
 
 export const getAutomationJob = async (id: number) => {
-  const response = await api.get(`/automationjobs/${id}`);
+  const response = await api.get(`/workingcrud/automationjobs/${id}`);
   return response.data;
 };
 
 export const createAutomationJob = async (job: any) => {
-  const response = await api.post('/automationjobs', job);
+  const response = await api.post('/workingcrud/automationjobs', job);
   return response.data;
 };
 
 export const updateAutomationJob = async (job: any) => {
-  const response = await api.put(`/automationjobs/${job.id}`, job);
+  const response = await api.put(`/workingcrud/automationjobs/${job.id}`, job);
   return response.data;
 };
 
 export const deleteAutomationJob = async (id: number) => {
-  await api.delete(`/automationjobs/${id}`);
+  await api.delete(`/workingcrud/automationjobs/${id}`);
 };
 
 export const getAutomationJobsByStatus = async (status: string) => {
-  const response = await api.get(`/automationjobs/status/${status}`);
+  const response = await api.get(`/workingcrud/automationjobs/status/${status}`);
   return response.data;
 };
 
 export const getAutomationJobsByType = async (jobType: string) => {
-  const response = await api.get(`/automationjobs/type/${jobType}`);
+  const response = await api.get(`/workingcrud/automationjobs/type/${jobType}`);
   return response.data;
 };
 
 // Users API
 export const getUsers = async () => {
-  const response = await api.get('/users');
+  const response = await api.get('/workingcrud/users');
   return response.data;
 };
 
 export const getUser = async (id: number) => {
-  const response = await api.get(`/users/${id}`);
+  const response = await api.get(`/workingcrud/users/${id}`);
   return response.data;
 };
 
 export const createUser = async (user: any) => {
-  const response = await api.post('/users', user);
+  const response = await api.post('/workingcrud/users', user);
   return response.data;
 };
 
 export const updateUser = async (user: any) => {
-  const response = await api.put(`/users/${user.id}`, user);
+  const response = await api.put(`/workingcrud/users/${user.id}`, user);
   return response.data;
 };
 
 export const deleteUser = async (id: number) => {
-  await api.delete(`/users/${id}`);
+  await api.delete(`/workingcrud/users/${id}`);
 };
 
 // Test Executions API

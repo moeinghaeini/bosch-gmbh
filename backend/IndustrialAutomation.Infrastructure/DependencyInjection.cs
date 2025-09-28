@@ -24,8 +24,8 @@ public static class DependencyInjection
         services.AddScoped<IJobScheduleRepository, JobScheduleRepository>();
 
         // Add Services
-        services.AddScoped<IAIService, OpenAIService>();
-        services.AddHttpClient<IAIService, OpenAIService>();
+        services.AddScoped<IAIService, AIService>();
+        services.AddHttpClient<IAIService, AIService>();
         services.AddScoped<IMonitoringService, MonitoringService>();
 
         return services;

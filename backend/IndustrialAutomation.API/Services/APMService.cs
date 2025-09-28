@@ -75,7 +75,7 @@ public class APMService : IAPMService
             if (_cache.TryGetValue($"trace_{traceId}", out PerformanceMetric? trace))
             {
                 trace.EndTime = DateTime.UtcNow;
-                trace.Duration = (trace.EndTime - trace.StartTime).TotalMilliseconds;
+                trace.Duration = (trace.EndTime - trace.StartTime)?.TotalMilliseconds ?? 0;
                 trace.Status = success ? "Completed" : "Failed";
                 trace.Error = error;
                 trace.Success = success;
@@ -129,7 +129,7 @@ public class APMService : IAPMService
             if (_cache.TryGetValue($"span_{spanId}", out Span? span))
             {
                 span.EndTime = DateTime.UtcNow;
-                span.Duration = (span.EndTime - span.StartTime).TotalMilliseconds;
+                span.Duration = (span.EndTime - span.StartTime)?.TotalMilliseconds ?? 0;
                 span.Status = success ? "Completed" : "Failed";
                 span.Error = error;
                 span.Success = success;

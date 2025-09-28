@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using IndustrialAutomation.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 
-namespace BoschThesis.API.Controllers;
+namespace IndustrialAutomation.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

@@ -130,11 +130,11 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add new services
-builder.Services.AddScoped<IApiGatewayService, ApiGatewayService>();
-builder.Services.AddScoped<IMLOpsService, MLOpsService>();
-builder.Services.AddScoped<IWorkflowEngineService, WorkflowEngineService>();
-builder.Services.AddScoped<IIndustry4IntegrationService, Industry4IntegrationService>();
-builder.Services.AddScoped<IAPMService, APMService>();
+// builder.Services.AddScoped<IApiGatewayService, ApiGatewayService>();
+// builder.Services.AddScoped<IMLOpsService, MLOpsService>();
+// builder.Services.AddScoped<IWorkflowEngineService, WorkflowEngineService>();
+// builder.Services.AddScoped<IIndustry4IntegrationService, Industry4IntegrationService>();
+// builder.Services.AddScoped<IAPMService, APMService>();
 builder.Services.AddScoped<IEnhancedCacheService, EnhancedCacheService>();
 
 // Add Authentication services
@@ -164,8 +164,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // Add Rate Limiting
-builder.Services.Configure<RateLimitOptions>(builder.Configuration.GetSection("RateLimiting"));
-builder.Services.AddSingleton<RateLimitOptions>();
+// builder.Services.Configure<RateLimitOptions>(builder.Configuration.GetSection("RateLimiting"));
+// builder.Services.AddSingleton<RateLimitOptions>();
 
 // Add Health Checks
 builder.Services.AddHealthChecks()

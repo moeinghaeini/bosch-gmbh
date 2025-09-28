@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace BoschThesis.API.Controllers;
+namespace IndustrialAutomation.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
