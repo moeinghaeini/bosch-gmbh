@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Add, Edit, Delete, Psychology, PlayArrow, Web } from '@mui/icons-material';
-import { getWebAutomations, createWebAutomation, updateWebAutomation, deleteWebAutomation } from '../services/mockApi.ts';
+import { getWebAutomations, createWebAutomation, updateWebAutomation, deleteWebAutomation } from '../services/mockApi';
 
 interface WebAutomation {
   id: number;

@@ -21,6 +21,8 @@ public class IndustrialAutomationDbContext : DbContext
         public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
         public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<PerformanceMetric> PerformanceMetrics { get; set; }
+        public DbSet<SystemLog> SystemLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

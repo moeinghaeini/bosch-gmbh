@@ -1,5 +1,7 @@
 using IndustrialAutomation.Core.Interfaces;
+using IndustrialAutomation.Core.Entities;
 using IndustrialAutomation.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
@@ -29,12 +31,12 @@ public class MonitoringService : IMonitoringService
     {
         try
         {
-            var metric = new PerformanceMetric
+            var metric = new IndustrialAutomation.Core.Entities.PerformanceMetric
             {
                 MetricName = metricName,
                 MetricValue = value,
                 Category = "Custom",
-                Tags = tags != null ? JsonSerializer.Serialize(tags) : null,
+                Tags = tags != null ? JsonSerializer.Serialize(tags) : string.Empty,
                 Timestamp = DateTime.UtcNow
             };
 
@@ -519,18 +521,27 @@ public class MonitoringService : IMonitoringService
                 .OrderByDescending(log => log.Timestamp)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(log => new Dictionary<string, object>
-                {
-                    ["id"] = log.Id,
-                    ["level"] = log.Level,
-                    ["message"] = log.Message,
-                    ["source"] = log.Source,
-                    ["timestamp"] = log.Timestamp,
-                    ["exception"] = log.Exception
+                .Select(log => new { 
+                    Id = log.Id,
+                    Level = log.Level,
+                    Message = log.Message,
+                    Source = log.Source,
+                    Timestamp = log.Timestamp,
+                    Exception = log.Exception
                 })
                 .ToListAsync();
 
-            return logs;
+            var result = logs.Select(log => new Dictionary<string, object>
+            {
+                ["id"] = log.Id,
+                ["level"] = log.Level,
+                ["message"] = log.Message,
+                ["source"] = log.Source,
+                ["timestamp"] = log.Timestamp,
+                ["exception"] = log.Exception
+            }).ToList();
+
+            return result;
         }
         catch (Exception ex)
         {

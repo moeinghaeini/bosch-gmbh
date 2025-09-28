@@ -1,76 +1,50 @@
-# Bosch Industrial Automation Platform - Production Backend Dockerfile
-# Multi-stage build for optimized production image
-
-# =============================================
-# BUILD STAGE
-# =============================================
+# Multi-stage build for production
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-
-# Set working directory
 WORKDIR /src
 
 # Copy project files
-COPY BoschThesis.sln ./
-COPY BoschThesis.API/BoschThesis.API.csproj ./BoschThesis.API/
-COPY BoschThesis.Core/BoschThesis.Core.csproj ./BoschThesis.Core/
-COPY BoschThesis.Infrastructure/BoschThesis.Infrastructure.csproj ./BoschThesis.Infrastructure/
+COPY ["IndustrialAutomation.API/IndustrialAutomation.API.csproj", "IndustrialAutomation.API/"]
+COPY ["IndustrialAutomation.Core/IndustrialAutomation.Core.csproj", "IndustrialAutomation.Core/"]
+COPY ["IndustrialAutomation.Infrastructure/IndustrialAutomation.Infrastructure.csproj", "IndustrialAutomation.Infrastructure/"]
 
 # Restore dependencies
-RUN dotnet restore
+RUN dotnet restore "IndustrialAutomation.API/IndustrialAutomation.API.csproj"
 
 # Copy source code
 COPY . .
 
-# Build the application
-RUN dotnet build "BoschThesis.API/BoschThesis.API.csproj" -c Release -o /app/build
+# Build and publish
+WORKDIR "/src/IndustrialAutomation.API"
+RUN dotnet publish "IndustrialAutomation.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# =============================================
-# PUBLISH STAGE
-# =============================================
-FROM build AS publish
-
-# Publish the application
-RUN dotnet publish "BoschThesis.API/BoschThesis.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
-
-# =============================================
-# RUNTIME STAGE
-# =============================================
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
-
-# Install additional tools for production
-RUN apt-get update && apt-get install -y \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create non-root user for security
-RUN groupadd -r appuser && useradd -r -g appuser appuser
-
-# Set working directory
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-# Copy published application
-COPY --from=publish /app/publish .
+# Create non-root user
+RUN addgroup --system --gid 1001 dotnet && \
+    adduser --system --uid 1001 --ingroup dotnet dotnet
 
-# Create logs directory
-RUN mkdir -p /app/logs && chown -R appuser:appuser /app
+# Copy published app
+COPY --from=build /app/publish .
 
-# Set permissions
-RUN chown -R appuser:appuser /app
+# Create logs directory and set permissions
+RUN mkdir -p /app/logs && \
+    chown -R dotnet:dotnet /app
 
 # Switch to non-root user
-USER appuser
+USER dotnet
+
+# Set environment variables
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://+:80
 
 # Expose port
 EXPOSE 80
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:80/health || exit 1
-
-# Set environment variables
-ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:80
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost/health || exit 1
 
 # Start the application
-ENTRYPOINT ["dotnet", "BoschThesis.API.dll"]
+ENTRYPOINT ["dotnet", "IndustrialAutomation.API.dll"]

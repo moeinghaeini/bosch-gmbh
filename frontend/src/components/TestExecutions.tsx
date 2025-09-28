@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Add, Edit, Delete, Psychology, PlayArrow } from '@mui/icons-material';
-import { getTestExecutions, createTestExecution, updateTestExecution, deleteTestExecution, analyzeTestExecution } from '../services/mockApi.ts';
+import { getTestExecutions, createTestExecution, updateTestExecution, deleteTestExecution, analyzeTestExecution } from '../services/mockApi';
 
 interface TestExecution {
   id: number;

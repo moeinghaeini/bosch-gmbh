@@ -1,99 +1,61 @@
-# Bosch Industrial Automation Platform - Production Docker Compose
-# This configuration is optimized for production deployment with high availability
-
 version: '3.8'
 
 services:
-  # SQL Server with high availability configuration
+  # SQL Server Database
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: bosch-thesis-sqlserver-prod
+    container_name: industrial-automation-sqlserver-prod
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=${DB_SA_PASSWORD}
       - MSSQL_PID=Standard
-      - MSSQL_AGENT_ENABLED=true
-      - MSSQL_MEMORY_LIMIT_MB=4096
-      - MSSQL_MAX_MEMORY=4096
     ports:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
-      - ./backend/database/backup:/var/opt/mssql/backup
-      - ./backend/database/scripts:/var/opt/mssql/scripts
     networks:
-      - bosch-thesis-network
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-          cpus: '2.0'
-        reservations:
-          memory: 2G
-          cpus: '1.0'
+      - industrial-automation-network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P ${DB_SA_PASSWORD} -C -Q 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${DB_SA_PASSWORD}' -Q 'SELECT 1' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+      start_period: 30s
 
-  # Redis for caching and session management
+  # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: bosch-thesis-redis-prod
+    container_name: industrial-automation-redis-prod
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
-      - bosch-thesis-network
-    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD}
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: '0.5'
-        reservations:
-          memory: 512M
-          cpus: '0.25'
+      - industrial-automation-network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
-  # Backend API with production optimizations
+  # Backend API
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.prod
-    container_name: bosch-thesis-backend-prod
+      dockerfile: Dockerfile
+    container_name: industrial-automation-backend-prod
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=BoschThesisDb;User Id=sa;Password=${DB_SA_PASSWORD};TrustServerCertificate=true;MultipleActiveResultSets=true;Max Pool Size=100;Min Pool Size=5;Connection Timeout=30;Command Timeout=30;
-      - ConnectionStrings__Redis=Server=redis;Port=6379;Password=${REDIS_PASSWORD};Database=0;
-      - JWT__SecretKey=${JWT_SECRET_KEY}
-      - JWT__Issuer=BoschThesis
-      - JWT__Audience=BoschThesis
-      - JWT__ExpiryMinutes=60
-      - Logging__LogLevel__Default=Information
-      - Logging__LogLevel__Microsoft=Warning
-      - Logging__LogLevel__System=Warning
-      - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=IndustrialAutomationDb;User Id=sa;Password=${DB_SA_PASSWORD};TrustServerCertificate=true;
+      - Redis__ConnectionString=redis:6379
+      - Jwt__Secret=${JWT_SECRET_KEY}
+      - Jwt__Issuer=IndustrialAutomation
+      - Jwt__Audience=IndustrialAutomation
+      - OpenAI__ApiKey=${OPENAI_API_KEY}
+      - OpenAI__Model=gpt-4
     ports:
       - "5001:80"
     depends_on:
@@ -101,183 +63,93 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    volumes:
+      - ./backend/logs:/app/logs
     networks:
-      - bosch-thesis-network
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-          cpus: '1.0'
-        reservations:
-          memory: 1G
-          cpus: '0.5'
+      - industrial-automation-network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
 
-  # Frontend with production optimizations
+  # Frontend React App
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod
-    container_name: bosch-thesis-frontend-prod
-    environment:
-      - REACT_APP_API_URL=https://api.bosch-thesis.com
-      - REACT_APP_ENVIRONMENT=production
-      - GENERATE_SOURCEMAP=false
+      dockerfile: Dockerfile
+    container_name: industrial-automation-frontend-prod
     ports:
       - "3000:80"
     depends_on:
       - backend
     networks:
-      - bosch-thesis-network
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '0.25'
-        reservations:
-          memory: 256M
-          cpus: '0.1'
+      - industrial-automation-network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD", "curl", "-f", "http://localhost/"]
       interval: 30s
       timeout: 10s
       retries: 3
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
-  # Nginx reverse proxy for production
+  # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
-    container_name: bosch-thesis-nginx-prod
+    container_name: industrial-automation-nginx-prod
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/logs:/var/log/nginx
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - frontend
       - backend
     networks:
-      - bosch-thesis-network
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.25'
-        reservations:
-          memory: 128M
-          cpus: '0.1'
+      - industrial-automation-network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      test: ["CMD", "curl", "-f", "http://localhost/"]
       interval: 30s
       timeout: 10s
       retries: 3
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
-  # Database monitoring with Prometheus
+  # Prometheus Monitoring
   prometheus:
     image: prom/prometheus:latest
-    container_name: bosch-thesis-prometheus-prod
+    container_name: industrial-automation-prometheus-prod
     ports:
       - "9090:9090"
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=720h'
+      - '--web.enable-lifecycle'
     networks:
-      - bosch-thesis-network
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '0.25'
-        reservations:
-          memory: 256M
-          cpus: '0.1'
+      - industrial-automation-network
     restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
-  # Grafana for monitoring dashboards
+  # Grafana Dashboard
   grafana:
     image: grafana/grafana:latest
-    container_name: bosch-thesis-grafana-prod
+    container_name: industrial-automation-grafana-prod
     ports:
       - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       - prometheus
     networks:
-      - bosch-thesis-network
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '0.25'
-        reservations:
-          memory: 256M
-          cpus: '0.1'
+      - industrial-automation-network
     restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # Database backup service
-  db-backup:
-    image: mcr.microsoft.com/mssql-tools:latest
-    container_name: bosch-thesis-db-backup-prod
-    environment:
-      - DB_SERVER=sqlserver
-      - DB_NAME=BoschThesisDb
-      - DB_USER=sa
-      - DB_PASSWORD=${DB_SA_PASSWORD}
-      - BACKUP_SCHEDULE=0 2 * * *
-    volumes:
-      - ./backend/database/backup:/backup
-      - ./scripts/backup.sh:/backup.sh
-    depends_on:
-      - sqlserver
-    networks:
-      - bosch-thesis-network
-    command: ["/bin/bash", "/backup.sh"]
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
 
 volumes:
   sqlserver_data:
@@ -290,8 +162,5 @@ volumes:
     driver: local
 
 networks:
-  bosch-thesis-network:
+  industrial-automation-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16

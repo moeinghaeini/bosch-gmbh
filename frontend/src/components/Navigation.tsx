@@ -30,6 +30,8 @@ const Navigation: React.FC = () => {
         return 5;
       case '/job-schedules':
         return 6;
+      case '/performance':
+        return 7;
       default:
         return 0;
     }
@@ -42,7 +44,8 @@ const Navigation: React.FC = () => {
     { label: 'Operators', path: '/users', icon: <People />, color: '#ed6c02' },
     { label: 'Quality Control', path: '/test-executions', icon: <Psychology />, color: '#9c27b0' },
     { label: 'System Integration', path: '/web-automations', icon: <Web />, color: '#ff9800' },
-    { label: 'Maintenance', path: '/job-schedules', icon: <Schedule />, color: '#607d8b' }
+    { label: 'Maintenance', path: '/job-schedules', icon: <Schedule />, color: '#607d8b' },
+    { label: 'Performance Monitor', path: '/performance', icon: <Analytics />, color: '#03a9f4' }
   ];
 
   return (

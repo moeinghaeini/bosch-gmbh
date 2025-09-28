@@ -1,6 +1,7 @@
 using IndustrialAutomation.Core.Interfaces;
 using IndustrialAutomation.Core.Models;
 using IndustrialAutomation.Core.Entities;
+using IndustrialAutomation.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -441,7 +442,7 @@ public class AuthService : IAuthService
         if (user == null)
             return false;
 
-        return user.Role == role || user.UserRoles.Any(ur => ur.UserRole.RoleName == role);
+        return user.Role == role || user.UserRoles.Any(ur => ur.UserRoleName == role);
     }
 
     private string GenerateJwtToken(User user)

@@ -3,13 +3,13 @@ using IndustrialAutomation.Core.Interfaces;
 using IndustrialAutomation.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace BoschThesis.Infrastructure.Repositories;
+namespace IndustrialAutomation.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {
-    private readonly BoschThesisDbContext _context;
+    private readonly IndustrialAutomationDbContext _context;
 
-    public UserRepository(BoschThesisDbContext context)
+    public UserRepository(IndustrialAutomationDbContext context)
     {
         _context = context;
     }

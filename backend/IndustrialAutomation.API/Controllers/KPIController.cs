@@ -47,7 +47,7 @@ public class KPIController : ControllerBase
                 FailureRate = totalTests > 0 ? Math.Round((double)failedTests / totalTests * 100, 2) : 0,
                 AverageExecutionTime = testExecutions
                     .Where(t => t.ExecutionTime.HasValue)
-                    .Average(t => t.ExecutionTime!.Value.TotalMinutes),
+                    .Average(t => t.ExecutionTime!.Value / 60.0), // Convert seconds to minutes
                 TestsByType = testExecutions
                     .GroupBy(t => t.TestType)
                     .ToDictionary(g => g.Key, g => g.Count()),
@@ -87,7 +87,7 @@ public class KPIController : ControllerBase
                 FailureRate = totalAutomations > 0 ? Math.Round((double)failedAutomations / totalAutomations * 100, 2) : 0,
                 AverageExecutionTime = webAutomations
                     .Where(w => w.ExecutionTime.HasValue)
-                    .Average(w => w.ExecutionTime!.Value.TotalMinutes),
+                    .Average(w => w.ExecutionTime!.Value / 60.0), // Convert seconds to minutes
                 AutomationsByType = webAutomations
                     .GroupBy(w => w.AutomationType)
                     .ToDictionary(g => g.Key, g => g.Count()),

@@ -81,7 +81,7 @@ public class GlobalExceptionMiddleware
                 TraceId = traceId,
                 Path = path
             },
-            ArgumentException argEx => new ErrorResponse
+            ArgumentException argEx when !(argEx is ValidationException) => new ErrorResponse
             {
                 Error = "INVALID_ARGUMENT",
                 Message = argEx.Message,

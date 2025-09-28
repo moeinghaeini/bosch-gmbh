@@ -4,6 +4,8 @@ public class UserRole : BaseEntity
 {
     public string RoleName { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    public int RoleId { get; set; } = 0; // Role ID for compatibility
+    public string UserRoleName { get; set; } = string.Empty; // User role name for compatibility
     public string Permissions { get; set; } = string.Empty; // JSON permissions
     public bool IsActive { get; set; } = true;
     public int Priority { get; set; } = 0; // Role hierarchy

@@ -134,6 +134,267 @@ bosch-gmbh/
    docker-compose -f docker-compose.prod.yml up -d
    ```
 
+## 📖 User Guide
+
+### 🚀 How to Run the Application
+
+#### Option 1: Docker Compose (Recommended)
+
+1. **Start all services**
+   ```bash
+   docker-compose up -d
+   ```
+
+2. **Check service status**
+   ```bash
+   docker-compose ps
+   ```
+
+3. **View logs (if needed)**
+   ```bash
+   docker-compose logs [service-name]
+   # Examples:
+   docker-compose logs backend
+   docker-compose logs frontend
+   docker-compose logs sqlserver
+   ```
+
+4. **Stop the application**
+   ```bash
+   docker-compose down
+   ```
+
+#### Option 2: Manual Development Setup
+
+1. **Start database and Redis**
+   ```bash
+   docker-compose up -d sqlserver redis
+   ```
+
+2. **Run backend locally**
+   ```bash
+   cd backend
+   dotnet run --project IndustrialAutomation.API
+   ```
+
+3. **Run frontend locally**
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
+
+### 🌐 Accessing the Application
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Main Application** | http://localhost:3000 | React frontend interface |
+| **API Documentation** | http://localhost:5001/swagger | Interactive API documentation |
+| **Health Check** | http://localhost:5001/health | Backend health status |
+| **Database** | localhost:1433 | SQL Server database |
+
+### 🎯 How to Use the Application
+
+#### 1. **Dashboard Overview**
+- **Access**: Navigate to http://localhost:3000
+- **Features**: 
+  - Real-time KPIs and metrics
+  - System health status
+  - Recent automation jobs
+  - Performance indicators
+
+#### 2. **User Management**
+- **Navigate to**: Users section in the sidebar
+- **Features**:
+  - Create new users
+  - Assign roles (Admin, Operator, Viewer)
+  - Manage user permissions
+  - View user activity
+
+#### 3. **Automation Jobs**
+- **Navigate to**: Automation Jobs section
+- **Features**:
+  - Create new automation jobs
+  - Monitor job status (Pending, Running, Completed, Failed)
+  - View job details and logs
+  - Manage job schedules
+
+#### 4. **Test Executions**
+- **Navigate to**: Test Executions section
+- **Features**:
+  - View test execution history
+  - Analyze test results with AI
+  - Generate new test cases
+  - Optimize test suites
+
+#### 5. **Web Automations**
+- **Navigate to**: Web Automations section
+- **Features**:
+  - Configure web automation tasks
+  - AI-powered element recognition
+  - Natural language automation commands
+  - Multi-step workflow creation
+
+#### 6. **Job Scheduling**
+- **Navigate to**: Job Schedules section
+- **Features**:
+  - Schedule recurring jobs
+  - Set up automation workflows
+  - Monitor scheduled executions
+  - Enable/disable schedules
+
+#### 7. **KPI Dashboard**
+- **Navigate to**: KPIs section
+- **Features**:
+  - Test execution metrics
+  - Web automation success rates
+  - Job scheduling performance
+  - Overall system performance
+
+### 🔧 Common Operations
+
+#### Creating a New Automation Job
+1. Go to **Automation Jobs** section
+2. Click **"Add New Job"**
+3. Fill in job details:
+   - Name and description
+   - Job type (Test Execution, Web Automation, etc.)
+   - Priority level
+   - Configuration parameters
+4. Click **"Save"**
+
+#### Scheduling a Job
+1. Go to **Job Schedules** section
+2. Click **"Create Schedule"**
+3. Configure schedule:
+   - Select job to schedule
+   - Set frequency (Daily, Weekly, Monthly)
+   - Choose execution time
+   - Set dependencies
+4. Click **"Save"**
+
+#### Monitoring System Health
+1. Check the **Dashboard** for overall status
+2. Use **KPIs** section for detailed metrics
+3. Monitor **Performance Monitor** for real-time data
+4. Check **Health** endpoint: http://localhost:5001/health
+
+#### Using AI Features
+1. **Test Analysis**: Go to Test Executions → Select test → Click "Analyze"
+2. **Web Automation**: Go to Web Automations → Click "AI Analysis"
+3. **Element Recognition**: Use "Identify Element" for smart web interactions
+4. **Script Generation**: Use "Generate Script" for automation code
+
+### 🛠️ Troubleshooting
+
+#### Application Won't Start
+```bash
+# Check if all services are running
+docker-compose ps
+
+# Restart services
+docker-compose restart
+
+# Check logs for errors
+docker-compose logs backend
+docker-compose logs frontend
+```
+
+#### Database Connection Issues
+```bash
+# Check database status
+docker-compose logs sqlserver
+
+# Restart database
+docker-compose restart sqlserver
+
+# Wait for database to initialize (30-60 seconds)
+```
+
+#### Frontend Not Loading
+```bash
+# Check frontend logs
+docker-compose logs frontend
+
+# Restart frontend
+docker-compose restart frontend
+
+# Clear browser cache
+```
+
+#### API Not Responding
+```bash
+# Check backend health
+curl http://localhost:5001/health
+
+# Check backend logs
+docker-compose logs backend
+
+# Restart backend
+docker-compose restart backend
+```
+
+### 📊 Performance Monitoring
+
+#### System Metrics
+- **Response Time**: Monitor API response times
+- **Throughput**: Track requests per second
+- **Error Rate**: Monitor failed requests
+- **Resource Usage**: CPU, memory, and disk usage
+
+#### Business Metrics
+- **Job Success Rate**: Percentage of successful automation jobs
+- **Test Coverage**: Test execution coverage metrics
+- **User Activity**: Active users and session duration
+- **Automation Efficiency**: Time saved through automation
+
+### 🔐 Security Best Practices
+
+#### User Management
+- Use strong passwords
+- Implement role-based access control
+- Regular user access reviews
+- Enable audit logging
+
+#### API Security
+- Use HTTPS in production
+- Implement rate limiting
+- Validate all inputs
+- Monitor for suspicious activity
+
+#### Data Protection
+- Encrypt sensitive data
+- Regular backups
+- Secure database connections
+- Implement data retention policies
+
+### 📱 Mobile and Responsive Design
+
+The application is fully responsive and works on:
+- **Desktop**: Full feature access
+- **Tablet**: Optimized interface
+- **Mobile**: Core functionality available
+
+### 🔄 Backup and Recovery
+
+#### Database Backup
+```bash
+# Create backup
+docker-compose exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourPassword' -Q "BACKUP DATABASE IndustrialAutomationDb TO DISK = '/var/opt/mssql/backup/backup.bak'"
+
+# Restore backup
+docker-compose exec sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourPassword' -Q "RESTORE DATABASE IndustrialAutomationDb FROM DISK = '/var/opt/mssql/backup/backup.bak'"
+```
+
+#### Application Data Backup
+```bash
+# Backup application data
+docker-compose exec backend dotnet run --project IndustrialAutomation.Infrastructure -- backup
+
+# Restore application data
+docker-compose exec backend dotnet run --project IndustrialAutomation.Infrastructure -- restore
+```
+
 ## 📊 Database Schema
 
 The platform uses a comprehensive database schema with the following key entities:

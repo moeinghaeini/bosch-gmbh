@@ -1,0 +1,240 @@
+
+Internship for Thesis - Software Engineer
+Via Monte Aquila, 43124 Parma PR, Italy
+Full-time
+Legal Entity: Robert Bosch S.p.a Società Unipersonale
+Company Description
+At Bosch, we care; for you, our business, and our environment.
+
+Let’s turn visions into reality. At Bosch, we shape the future by inventing high-quality technologies and services that spark enthusiasm and enrich people’s lives. Our areas of activity are every bit as diverse as our outstanding Bosch-teams around the world. Their creativity is the key to innovation through connected living, mobility or industry. Our responsibility goes far beyond ‘business’. We’re independent of stock markets and bound to the purpose of the Robert Bosch Foundation; our success directly benefits society, the environment, and future generations. Our promise to our associates is rock-solid: we grow together, we enjoy our work, and we inspire each other. Join in and feel the difference.
+
+Job Description
+Your thesis could focus on one of these topic:
+
+1) Study on the Use of Advanced Methods (such as AI) for Automated Test Execution
+
+a. This activity involves studying and analyzing final verification approaches for processing large amounts of data, aiming to derive potential automated solutions capable of efficiently and effectively covering validation.
+b. The activity requires knowledge of computer engineering and the ability to evaluate different AI approaches to determine the most promising options. The work environment includes .NET, SQL Server, and React JS.
+c. Final Deliverable: Implementation of an automated system applied to one or more specific tests, along with theoretical and experimental analysis of the results in terms of quality and performance.
+
+2) Study and Development of an AI-Based Web Automation Solution
+
+a. This activity aims to study a non-deterministic method for automating interactions with third-party web pages. For certain business processes, Bosch has agreements with suppliers that require executing long sequences of downloads using various vendors' portals. Currently, different automation suites are used, but they all require exact knowledge of the web pages being interacted with. The goal is to transition to AI-based methods that can identify the elements of web pages to interact with in order to complete the required tasks.
+b. The activity requires knowledge of computer engineering and the ability to evaluate different AI approaches to determine the most promising options. The work environment includes .NET, SQL Server, and React JS.
+c. Final Deliverable: Implementation of an automated system capable of interacting with websites based on descriptive prompts, without needing the exact layout or graphical structure of the sites involved. This will be accompanied by a theoretical and experimental analysis of the results in terms of quality and performance.
+
+3) Development of a Web-Based Back-Office Interface for Automation Supervision
+
+a. An internal data processing orchestration system has been developed to handle specific data flow requirements. This system is based on scheduling and various metadata regarding automation "jobs." Currently, there is no interface for system administration (e.g., permission management, etc.), and developing such an interface is the goal of this proposed activity.
+b. The activity requires knowledge of computer engineering. The work environment includes .NET, SQL Server, and React JS.
+c. Final Deliverable: Implementation (and related documentation) of a web interface for managing the task orchestrator's activities.
+
+Qualifications
+What distinguishes you?   
+
+Education: Bachelor's/Master's Degree in Computer Engineering
+Languages: English (min. B2)
+Know-how: knowledge of .NET, SWL Server, and React JS.
+Additional Information
+ Internships foresee reimbursement at Bosch Italia. Depending on the level of your education, you will reimbursed with 700/900 euros (gross)/month.
+
+Bosch is proud to be an Equal Opportunity Employer. All qualified applicants will receive consideration for employment without regard to race, color, religion, sex, sexual orientation, gender identity, marital status, national origin or ancestry, age, disability or any other protected class.
+
+www.bosch.it
+
+https://www.bosch.it/lavora-con-noi/
+
+
+
+# **Proposal 1: AI-Driven Automated Test Execution**
+
+### 1. **Objective**
+
+Develop an AI-powered solution to automate test execution, validation, and result analysis across large datasets, improving test coverage, reducing execution time, and minimizing human intervention.
+
+---
+
+### 2. **Scope**
+
+* Study of **verification approaches** (rule-based, ML-driven anomaly detection, statistical validation).
+* Implementation of an **AI-enhanced test execution engine** integrated with .NET testing frameworks.
+* Handling **structured test cases** (SQL data-driven) and **unstructured results** (logs, error messages).
+
+---
+
+### 3. **Architecture**
+
+* **Frontend (React JS):** Dashboard to monitor test execution progress, visualize results, and track KPIs.
+* **Backend (.NET Core):** Orchestrates test execution, manages AI inference, integrates with test suites.
+* **Database (SQL Server):** Stores test metadata, execution logs, results, and historical patterns.
+* **AI Module:**
+
+  * Log classification (NLP for errors & anomalies).
+  * Test result clustering (unsupervised ML).
+  * Predictive failure detection (supervised ML).
+
+---
+
+### 4. **Methodology**
+
+1. **Data Collection** – Gather historical test data, logs, and results.
+2. **Model Evaluation** – Compare AI approaches:
+
+   * NLP (BERT, GPT-style models) for interpreting log messages.
+   * Decision Trees/Random Forests for pass/fail prediction.
+   * Anomaly detection for edge cases.
+3. **Integration** – Embed AI module in test pipeline (.NET environment).
+4. **Visualization** – Build React dashboards for coverage & performance tracking.
+5. **Validation** – Pilot with selected test suites, measure performance.
+
+---
+
+### 5. **KPIs**
+
+* Test execution time reduction (%).
+* Coverage improvement (% more tests automated).
+* Accuracy of AI-based failure classification (%).
+* Reduction in human intervention hours.
+
+---
+
+### 6. **Deliverables**
+
+* Working **AI-driven test automation system**.
+* **Dashboard** for monitoring test execution and results.
+* **Report**: theoretical analysis + experimental results.
+
+---
+
+---
+
+# **Proposal 2: AI-Based Web Automation Solution**
+
+### 1. **Objective**
+
+Develop an AI-driven solution that automates interactions with third-party vendor websites, reducing dependency on brittle, rule-based scripts by enabling natural-language-driven automation.
+
+---
+
+### 2. **Scope**
+
+* Automating **multi-step workflows** (downloads, form filling, navigation).
+* AI-powered **web element recognition** without exact DOM/XPath selectors.
+* Natural language **prompt-based task execution**.
+
+---
+
+### 3. **Architecture**
+
+* **Frontend (React JS):** Web interface for users to describe tasks in natural language (e.g., “Log into Vendor A portal, download invoice for Sept 2025”).
+* **Backend (.NET Core):**
+
+  * Orchestrates web automation.
+  * Translates natural language → structured actions.
+* **Database (SQL Server):** Task history, execution logs, results.
+* **AI Module:**
+
+  * Computer vision (e.g., screenshot + YOLO/Detectron) to identify buttons/fields.
+  * NLP (transformers) to map descriptive prompts to actions.
+  * Reinforcement Learning to improve element interaction strategies.
+* **Automation Engine:** Selenium/Playwright integrated with AI for adaptive element selection.
+
+---
+
+### 4. **Methodology**
+
+1. **Baseline Study** – Evaluate existing automation suites (Selenium, UiPath).
+2. **Model Selection** – Train/test AI models for DOM recognition & intent mapping.
+3. **Prototype** – Implement AI-assisted element detection on a sample vendor portal.
+4. **Scaling** – Generalize solution to multiple vendors’ sites.
+5. **Performance Testing** – Measure speed, success rate, and robustness.
+
+---
+
+### 5. **KPIs**
+
+* Success rate of completed workflows (%).
+* Average execution time reduction vs. manual (%).
+* Generalization across vendor portals (number of sites successfully automated).
+* Error recovery rate (%).
+
+---
+
+### 6. **Deliverables**
+
+* **AI-driven web automation tool** (natural language → action).
+* **Documentation & User Guide**.
+* **Experimental report**: analysis of robustness, speed, and accuracy.
+
+---
+
+---
+
+# **Proposal 3: Web-Based Back-Office Interface for Automation Supervision**
+
+### 1. **Objective**
+
+Design and implement a **React-based back-office system** for managing, scheduling, and monitoring automation jobs within Bosch’s internal orchestration framework.
+
+---
+
+### 2. **Scope**
+
+* Role-based **user management** (admin, operator, viewer).
+* Job orchestration UI: schedule, pause, resume, cancel.
+* Job monitoring with **real-time dashboards**.
+* Metadata & audit log tracking.
+
+---
+
+### 3. **Architecture**
+
+* **Frontend (React JS):**
+
+  * Admin panel for permissions.
+  * Job scheduling and monitoring dashboards.
+  * Logs & notifications.
+* **Backend (.NET Core):**
+
+  * Exposes APIs for orchestrator.
+  * Handles authentication & RBAC.
+* **Database (SQL Server):** Stores job metadata, logs, permissions.
+
+---
+
+### 4. **Methodology**
+
+1. **Requirement Analysis** – Collect system administration needs.
+2. **Design Phase** – Define data models (Jobs, Users, Roles, Permissions).
+3. **Implementation** – Develop React front-end and .NET APIs.
+4. **Integration** – Connect with orchestration engine.
+5. **Testing & Deployment** – Unit testing + user acceptance testing.
+
+---
+
+### 5. **KPIs**
+
+* Number of automation jobs successfully managed.
+* User adoption rate.
+* Time saved in supervision tasks vs. manual tracking.
+* System uptime (%).
+
+---
+
+### 6. **Deliverables**
+
+* **Fully functional back-office web interface**.
+* **Documentation** (User manual + Technical guide).
+* **Test report** with performance metrics.
+
+---
+
+---
+
+## 📊 **Industrial Alignment**
+
+* **Proposal 1** → R&D-driven, aligns with **quality assurance departments**.
+* **Proposal 2** → Operational efficiency, aligns with **procurement/vendor management**.
+* **Proposal 3** → Internal productivity, aligns with **IT operations & automation teams**.
+
+---

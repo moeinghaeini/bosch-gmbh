@@ -24,7 +24,7 @@ import {
 } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Add, Edit, Delete, PlayArrow, Pause, Schedule } from '@mui/icons-material';
-import { getJobSchedules, createJobSchedule, updateJobSchedule, deleteJobSchedule } from '../services/mockApi.ts';
+import { getJobSchedules, createJobSchedule, updateJobSchedule, deleteJobSchedule } from '../services/mockApi';
 
 interface JobSchedule {
   id: number;

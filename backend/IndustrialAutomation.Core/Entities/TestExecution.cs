@@ -5,12 +5,15 @@ public class TestExecution : BaseEntity
     public string TestName { get; set; } = string.Empty;
     public int TestTypeId { get; set; } = 1; // Foreign key to test type lookup
     public int StatusId { get; set; } = 1; // Foreign key to status lookup
+    public string Status { get; set; } = string.Empty; // Status name for compatibility
+    public string TestType { get; set; } = string.Empty; // Test type name for compatibility
     public string TestSuite { get; set; } = string.Empty;
     public string TestData { get; set; } = string.Empty; // JSON test data
     public string ExpectedResult { get; set; } = string.Empty;
     public string ActualResult { get; set; } = string.Empty;
     public string ErrorMessage { get; set; } = string.Empty;
     public int? ExecutionTimeMs { get; set; }
+    public int? ExecutionTime { get; set; } // For compatibility
     public string AIAnalysis { get; set; } = string.Empty; // Analysis results
     public string ConfidenceScore { get; set; } = string.Empty; // AI confidence level
     public string TestEnvironment { get; set; } = string.Empty;

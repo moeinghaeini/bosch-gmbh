@@ -40,23 +40,23 @@ export const getJobSchedules = async () => {
 };
 
 // Mock CRUD operations
-export const createAutomationJob = async (data: any) => ({ id: Date.now(), ...data });
-export const updateAutomationJob = async (data: any) => data;
-export const deleteAutomationJob = async (id: number) => true;
+export const createAutomationJob = async (data: any): Promise<any> => ({ id: Date.now(), ...data });
+export const updateAutomationJob = async (data: any): Promise<any> => data;
+export const deleteAutomationJob = async (id: number): Promise<boolean> => true;
 
-export const createUser = async (data: any) => ({ id: Date.now(), ...data });
-export const updateUser = async (data: any) => data;
-export const deleteUser = async (id: number) => true;
+export const createUser = async (data: any): Promise<any> => ({ id: Date.now(), ...data });
+export const updateUser = async (data: any): Promise<any> => data;
+export const deleteUser = async (id: number): Promise<boolean> => true;
 
-export const createTestExecution = async (data: any) => ({ id: Date.now(), ...data });
-export const updateTestExecution = async (data: any) => data;
-export const deleteTestExecution = async (id: number) => true;
-export const analyzeTestExecution = async (id: number) => ({ analysis: 'AI analysis result' });
+export const createTestExecution = async (data: any): Promise<any> => ({ id: Date.now(), ...data });
+export const updateTestExecution = async (data: any): Promise<any> => data;
+export const deleteTestExecution = async (id: number): Promise<boolean> => true;
+export const analyzeTestExecution = async (id: number): Promise<any> => ({ analysis: 'AI analysis result' });
 
-export const createWebAutomation = async (data: any) => ({ id: Date.now(), ...data });
-export const updateWebAutomation = async (data: any) => data;
-export const deleteWebAutomation = async (id: number) => true;
+export const createWebAutomation = async (data: any): Promise<any> => ({ id: Date.now(), ...data });
+export const updateWebAutomation = async (data: any): Promise<any> => data;
+export const deleteWebAutomation = async (id: number): Promise<boolean> => true;
 
-export const createJobSchedule = async (data: any) => ({ id: Date.now(), ...data });
-export const updateJobSchedule = async (data: any) => data;
-export const deleteJobSchedule = async (id: number) => true;
+export const createJobSchedule = async (data: any): Promise<any> => ({ id: Date.now(), ...data });
+export const updateJobSchedule = async (data: any): Promise<any> => data;
+export const deleteJobSchedule = async (id: number): Promise<boolean> => true;

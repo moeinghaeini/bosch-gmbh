@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Add, Edit, Delete } from '@mui/icons-material';
-import { getAutomationJobs, createAutomationJob, updateAutomationJob, deleteAutomationJob } from '../services/mockApi.ts';
+import { getAutomationJobs, createAutomationJob, updateAutomationJob, deleteAutomationJob } from '../services/mockApi';
 
 interface AutomationJob {
   id: number;

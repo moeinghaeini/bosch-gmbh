@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Add, Edit, Delete } from '@mui/icons-material';
-import { getUsers, createUser, updateUser, deleteUser } from '../services/mockApi.ts';
+import { getUsers, createUser, updateUser, deleteUser } from '../services/mockApi';
 
 interface User {
   id: number;

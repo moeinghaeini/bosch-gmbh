@@ -10,6 +10,8 @@ using System.IO.Compression;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,10 +42,10 @@ builder.Services.AddApiVersioning(opt =>
 {
     opt.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
     opt.AssumeDefaultVersionWhenUnspecified = true;
-    opt.ApiVersionReader = Microsoft.AspNetCore.Mvc.ApiVersionReader.Combine(
-        new Microsoft.AspNetCore.Mvc.HeaderApiVersionReader("X-Version"),
-        new Microsoft.AspNetCore.Mvc.QueryStringApiVersionReader("version"),
-        new Microsoft.AspNetCore.Mvc.UrlSegmentApiVersionReader()
+    opt.ApiVersionReader = ApiVersionReader.Combine(
+        new HeaderApiVersionReader("X-Version"),
+        new QueryStringApiVersionReader("version"),
+        new UrlSegmentApiVersionReader()
     );
 });
 
