@@ -54,18 +54,18 @@ public class WebAutomationRepository : IWebAutomationRepository
         return true;
     }
 
-    public async Task<IEnumerable<WebAutomation>> GetByStatusAsync(string status)
+    public async Task<IEnumerable<WebAutomation>> GetByStatusAsync(int statusId)
     {
         return await _context.WebAutomations
-            .Where(w => !w.IsDeleted && w.Status == status)
+            .Where(w => !w.IsDeleted && w.StatusId == statusId)
             .OrderByDescending(w => w.CreatedAt)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<WebAutomation>> GetByAutomationTypeAsync(string automationType)
+    public async Task<IEnumerable<WebAutomation>> GetByJobTypeAsync(int jobTypeId)
     {
         return await _context.WebAutomations
-            .Where(w => !w.IsDeleted && w.AutomationType == automationType)
+            .Where(w => !w.IsDeleted && w.JobTypeId == jobTypeId)
             .OrderByDescending(w => w.CreatedAt)
             .ToListAsync();
     }
@@ -89,7 +89,7 @@ public class WebAutomationRepository : IWebAutomationRepository
     public async Task<IEnumerable<WebAutomation>> GetFailedAutomationsAsync()
     {
         return await _context.WebAutomations
-            .Where(w => !w.IsDeleted && w.Status == "Failed")
+            .Where(w => !w.IsDeleted && w.StatusId == 4) // StatusId 4 = "Failed"
             .OrderByDescending(w => w.CreatedAt)
             .ToListAsync();
     }

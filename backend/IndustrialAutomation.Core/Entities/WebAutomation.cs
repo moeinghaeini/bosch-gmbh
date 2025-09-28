@@ -6,8 +6,6 @@ public class WebAutomation : BaseEntity
     public string WebsiteUrl { get; set; } = string.Empty;
     public int StatusId { get; set; } = 1; // Foreign key to status lookup
     public int JobTypeId { get; set; } = 1; // Foreign key to job type lookup
-    public string Status { get; set; } = string.Empty; // Status name for compatibility
-    public string AutomationType { get; set; } = string.Empty; // Automation type for compatibility
     public string TargetElement { get; set; } = string.Empty; // AI-identified element
     public string Action { get; set; } = string.Empty; // Click, Type, Select, Navigate
     public string InputData { get; set; } = string.Empty; // JSON input data

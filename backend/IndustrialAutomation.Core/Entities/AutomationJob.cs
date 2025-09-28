@@ -6,8 +6,6 @@ public class AutomationJob : BaseEntity
     public string Description { get; set; } = string.Empty;
     public int StatusId { get; set; } = 1; // Foreign key to status lookup
     public int JobTypeId { get; set; } = 1; // Foreign key to job type lookup
-    public string Status { get; set; } = string.Empty; // Status name for compatibility
-    public string JobType { get; set; } = string.Empty; // Job type name for compatibility
     public DateTime? ScheduledAt { get; set; }
     public DateTime? StartedAt { get; set; }
     public DateTime? CompletedAt { get; set; }

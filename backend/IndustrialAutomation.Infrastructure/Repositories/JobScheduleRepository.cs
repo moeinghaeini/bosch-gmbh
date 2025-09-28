@@ -54,18 +54,18 @@ public class JobScheduleRepository : IJobScheduleRepository
         return true;
     }
 
-    public async Task<IEnumerable<JobSchedule>> GetByStatusAsync(string status)
+    public async Task<IEnumerable<JobSchedule>> GetByStatusAsync(int statusId)
     {
         return await _context.JobSchedules
-            .Where(j => !j.IsDeleted && j.Status == status)
+            .Where(j => !j.IsDeleted && j.StatusId == statusId)
             .OrderBy(j => j.NextRunTime)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<JobSchedule>> GetByJobTypeAsync(string jobType)
+    public async Task<IEnumerable<JobSchedule>> GetByJobTypeAsync(int jobTypeId)
     {
         return await _context.JobSchedules
-            .Where(j => !j.IsDeleted && j.JobType == jobType)
+            .Where(j => !j.IsDeleted && j.JobTypeId == jobTypeId)
             .OrderBy(j => j.NextRunTime)
             .ToListAsync();
     }

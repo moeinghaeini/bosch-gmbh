@@ -103,32 +103,32 @@ public class JobSchedulesController : ControllerBase
         }
     }
 
-    [HttpGet("status/{status}")]
-    public async Task<ActionResult<IEnumerable<JobSchedule>>> GetJobSchedulesByStatus(string status)
+    [HttpGet("status/{statusId}")]
+    public async Task<ActionResult<IEnumerable<JobSchedule>>> GetJobSchedulesByStatus(int statusId)
     {
         try
         {
-            var jobSchedules = await _jobScheduleRepository.GetByStatusAsync(status);
+            var jobSchedules = await _jobScheduleRepository.GetByStatusAsync(statusId);
             return Ok(jobSchedules);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving job schedules by status {Status}", status);
+            _logger.LogError(ex, "Error retrieving job schedules by status {StatusId}", statusId);
             return StatusCode(500, "Internal server error");
         }
     }
 
-    [HttpGet("type/{jobType}")]
-    public async Task<ActionResult<IEnumerable<JobSchedule>>> GetJobSchedulesByType(string jobType)
+    [HttpGet("type/{jobTypeId}")]
+    public async Task<ActionResult<IEnumerable<JobSchedule>>> GetJobSchedulesByType(int jobTypeId)
     {
         try
         {
-            var jobSchedules = await _jobScheduleRepository.GetByJobTypeAsync(jobType);
+            var jobSchedules = await _jobScheduleRepository.GetByJobTypeAsync(jobTypeId);
             return Ok(jobSchedules);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving job schedules by type {JobType}", jobType);
+            _logger.LogError(ex, "Error retrieving job schedules by type {JobTypeId}", jobTypeId);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -246,7 +246,7 @@ public class JobSchedulesController : ControllerBase
 
             // Update the job to run immediately
             jobSchedule.NextRunTime = DateTime.UtcNow;
-            jobSchedule.Status = "Scheduled";
+            jobSchedule.StatusId = 1; // Scheduled (Pending)
             await _jobScheduleRepository.UpdateAsync(jobSchedule);
 
             return Ok();

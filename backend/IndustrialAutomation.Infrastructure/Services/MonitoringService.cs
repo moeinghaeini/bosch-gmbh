@@ -183,9 +183,9 @@ public class MonitoringService : IMonitoringService
 
             // Automation Jobs metrics
             var totalJobs = await _context.AutomationJobs.CountAsync();
-            var completedJobs = await _context.AutomationJobs.CountAsync(j => j.Status == "Completed");
-            var failedJobs = await _context.AutomationJobs.CountAsync(j => j.Status == "Failed");
-            var runningJobs = await _context.AutomationJobs.CountAsync(j => j.Status == "Running");
+            var completedJobs = await _context.AutomationJobs.CountAsync(j => j.StatusId == 3); // Completed
+            var failedJobs = await _context.AutomationJobs.CountAsync(j => j.StatusId == 4); // Failed
+            var runningJobs = await _context.AutomationJobs.CountAsync(j => j.StatusId == 2); // Running
 
             metrics["automation_jobs"] = new Dictionary<string, object>
             {
@@ -198,8 +198,8 @@ public class MonitoringService : IMonitoringService
 
             // Test Executions metrics
             var totalTests = await _context.TestExecutions.CountAsync();
-            var passedTests = await _context.TestExecutions.CountAsync(t => t.Status == "Passed");
-            var failedTests = await _context.TestExecutions.CountAsync(t => t.Status == "Failed");
+            var passedTests = await _context.TestExecutions.CountAsync(t => t.StatusId == 3); // Completed (passed)
+            var failedTests = await _context.TestExecutions.CountAsync(t => t.StatusId == 4); // Failed
 
             metrics["test_executions"] = new Dictionary<string, object>
             {
@@ -211,8 +211,8 @@ public class MonitoringService : IMonitoringService
 
             // Web Automations metrics
             var totalWebAutomations = await _context.WebAutomations.CountAsync();
-            var completedWebAutomations = await _context.WebAutomations.CountAsync(w => w.Status == "Completed");
-            var failedWebAutomations = await _context.WebAutomations.CountAsync(w => w.Status == "Failed");
+            var completedWebAutomations = await _context.WebAutomations.CountAsync(w => w.StatusId == 3); // Completed
+            var failedWebAutomations = await _context.WebAutomations.CountAsync(w => w.StatusId == 4); // Failed
 
             metrics["web_automations"] = new Dictionary<string, object>
             {
@@ -270,7 +270,7 @@ public class MonitoringService : IMonitoringService
 
             // Check for failed jobs
             var failedJobs = await _context.AutomationJobs
-                .Where(j => j.Status == "Failed" && j.CreatedAt > DateTime.UtcNow.AddHours(-1))
+                .Where(j => j.StatusId == 4 && j.CreatedAt > DateTime.UtcNow.AddHours(-1)) // StatusId 4 = "Failed"
                 .CountAsync();
 
             if (failedJobs > 3)

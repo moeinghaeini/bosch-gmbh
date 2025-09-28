@@ -106,32 +106,32 @@ public class WebAutomationsController : ControllerBase
         }
     }
 
-    [HttpGet("status/{status}")]
-    public async Task<ActionResult<IEnumerable<WebAutomation>>> GetWebAutomationsByStatus(string status)
+    [HttpGet("status/{statusId}")]
+    public async Task<ActionResult<IEnumerable<WebAutomation>>> GetWebAutomationsByStatus(int statusId)
     {
         try
         {
-            var webAutomations = await _webAutomationRepository.GetByStatusAsync(status);
+            var webAutomations = await _webAutomationRepository.GetByStatusAsync(statusId);
             return Ok(webAutomations);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving web automations by status {Status}", status);
+            _logger.LogError(ex, "Error retrieving web automations by status {StatusId}", statusId);
             return StatusCode(500, "Internal server error");
         }
     }
 
-    [HttpGet("type/{automationType}")]
-    public async Task<ActionResult<IEnumerable<WebAutomation>>> GetWebAutomationsByType(string automationType)
+    [HttpGet("type/{jobTypeId}")]
+    public async Task<ActionResult<IEnumerable<WebAutomation>>> GetWebAutomationsByType(int jobTypeId)
     {
         try
         {
-            var webAutomations = await _webAutomationRepository.GetByAutomationTypeAsync(automationType);
+            var webAutomations = await _webAutomationRepository.GetByJobTypeAsync(jobTypeId);
             return Ok(webAutomations);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving web automations by type {AutomationType}", automationType);
+            _logger.LogError(ex, "Error retrieving web automations by type {JobTypeId}", jobTypeId);
             return StatusCode(500, "Internal server error");
         }
     }

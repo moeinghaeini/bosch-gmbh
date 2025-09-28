@@ -119,8 +119,8 @@ public class IndustrialAutomationDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.JobName).IsRequired().HasMaxLength(200);
-            entity.Property(e => e.JobType).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.JobTypeId).IsRequired();
+            entity.Property(e => e.StatusId).IsRequired();
             entity.Property(e => e.CronExpression).HasMaxLength(100);
             entity.Property(e => e.Configuration).HasColumnType("nvarchar(max)");
             entity.Property(e => e.Priority).IsRequired().HasMaxLength(20);
@@ -131,11 +131,11 @@ public class IndustrialAutomationDbContext : DbContext
             entity.Property(e => e.Dependencies).HasColumnType("nvarchar(max)");
             
             // Performance indexes
-            entity.HasIndex(e => e.Status).HasDatabaseName("IX_JobSchedules_Status");
-            entity.HasIndex(e => e.JobType).HasDatabaseName("IX_JobSchedules_JobType");
+            entity.HasIndex(e => e.StatusId).HasDatabaseName("IX_JobSchedules_StatusId");
+            entity.HasIndex(e => e.JobTypeId).HasDatabaseName("IX_JobSchedules_JobTypeId");
             entity.HasIndex(e => e.IsEnabled).HasDatabaseName("IX_JobSchedules_IsEnabled");
             entity.HasIndex(e => e.NextRunTime).HasDatabaseName("IX_JobSchedules_NextRunTime");
-            entity.HasIndex(e => new { e.Status, e.IsEnabled }).HasDatabaseName("IX_JobSchedules_Status_Enabled");
+            entity.HasIndex(e => new { e.StatusId, e.IsEnabled }).HasDatabaseName("IX_JobSchedules_StatusId_Enabled");
         });
 
         // Seed data

@@ -63,16 +63,6 @@ public class GlobalExceptionMiddleware
                 Path = path,
                 Extensions = businessEx.Extensions
             },
-            ValidationException validationEx => new ValidationErrorResponse
-            {
-                Error = validationEx.ErrorCode,
-                Message = validationEx.Message,
-                Details = GetExceptionDetails(validationEx),
-                TraceId = traceId,
-                Path = path,
-                Extensions = validationEx.Extensions,
-                Errors = validationEx.ValidationErrors
-            },
             UnauthorizedAccessException => new ErrorResponse
             {
                 Error = "UNAUTHORIZED",
@@ -81,7 +71,7 @@ public class GlobalExceptionMiddleware
                 TraceId = traceId,
                 Path = path
             },
-            ArgumentException argEx when !(argEx is ValidationException) => new ErrorResponse
+            ArgumentException argEx => new ErrorResponse
             {
                 Error = "INVALID_ARGUMENT",
                 Message = argEx.Message,
@@ -124,7 +114,6 @@ public class GlobalExceptionMiddleware
             UnauthorizedException => (int)HttpStatusCode.Unauthorized,
             ForbiddenException => (int)HttpStatusCode.Forbidden,
             ConflictException => (int)HttpStatusCode.Conflict,
-            ValidationException => (int)HttpStatusCode.BadRequest,
             RateLimitException => (int)HttpStatusCode.TooManyRequests,
             ServiceUnavailableException => (int)HttpStatusCode.ServiceUnavailable,
             TimeoutException => (int)HttpStatusCode.RequestTimeout,

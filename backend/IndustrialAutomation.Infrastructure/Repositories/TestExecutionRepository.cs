@@ -54,18 +54,18 @@ public class TestExecutionRepository : ITestExecutionRepository
         return true;
     }
 
-    public async Task<IEnumerable<TestExecution>> GetByStatusAsync(string status)
+    public async Task<IEnumerable<TestExecution>> GetByStatusAsync(int statusId)
     {
         return await _context.TestExecutions
-            .Where(t => !t.IsDeleted && t.Status == status)
+            .Where(t => !t.IsDeleted && t.StatusId == statusId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<TestExecution>> GetByTestTypeAsync(string testType)
+    public async Task<IEnumerable<TestExecution>> GetByTestTypeAsync(int testTypeId)
     {
         return await _context.TestExecutions
-            .Where(t => !t.IsDeleted && t.TestType == testType)
+            .Where(t => !t.IsDeleted && t.TestTypeId == testTypeId)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
     }
@@ -89,7 +89,7 @@ public class TestExecutionRepository : ITestExecutionRepository
     public async Task<IEnumerable<TestExecution>> GetFailedTestsAsync()
     {
         return await _context.TestExecutions
-            .Where(t => !t.IsDeleted && t.Status == "Failed")
+            .Where(t => !t.IsDeleted && t.StatusId == 4) // StatusId 4 = "Failed"
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
     }

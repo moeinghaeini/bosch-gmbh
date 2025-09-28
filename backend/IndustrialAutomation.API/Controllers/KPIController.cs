@@ -33,9 +33,9 @@ public class KPIController : ControllerBase
         {
             var testExecutions = await _testExecutionRepository.GetAllAsync();
             var totalTests = testExecutions.Count();
-            var passedTests = testExecutions.Count(t => t.Status == "Passed");
-            var failedTests = testExecutions.Count(t => t.Status == "Failed");
-            var runningTests = testExecutions.Count(t => t.Status == "Running");
+            var passedTests = testExecutions.Count(t => t.StatusId == 3); // Completed (passed)
+            var failedTests = testExecutions.Count(t => t.StatusId == 4); // Failed
+            var runningTests = testExecutions.Count(t => t.StatusId == 2); // Running
 
             var kpis = new TestExecutionKPIs
             {
@@ -49,10 +49,10 @@ public class KPIController : ControllerBase
                     .Where(t => t.ExecutionTime.HasValue)
                     .Average(t => t.ExecutionTime!.Value / 60.0), // Convert seconds to minutes
                 TestsByType = testExecutions
-                    .GroupBy(t => t.TestType)
+                    .GroupBy(t => GetTestTypeName(t.TestTypeId))
                     .ToDictionary(g => g.Key, g => g.Count()),
                 TestsByStatus = testExecutions
-                    .GroupBy(t => t.Status)
+                    .GroupBy(t => GetStatusName(t.StatusId))
                     .ToDictionary(g => g.Key, g => g.Count()),
                 RecentTrends = CalculateRecentTrends(testExecutions)
             };
@@ -73,9 +73,9 @@ public class KPIController : ControllerBase
         {
             var webAutomations = await _webAutomationRepository.GetAllAsync();
             var totalAutomations = webAutomations.Count();
-            var completedAutomations = webAutomations.Count(w => w.Status == "Completed");
-            var failedAutomations = webAutomations.Count(w => w.Status == "Failed");
-            var runningAutomations = webAutomations.Count(w => w.Status == "Running");
+            var completedAutomations = webAutomations.Count(w => w.StatusId == 3); // Completed
+            var failedAutomations = webAutomations.Count(w => w.StatusId == 4); // Failed
+            var runningAutomations = webAutomations.Count(w => w.StatusId == 2); // Running
 
             var kpis = new WebAutomationKPIs
             {
@@ -89,10 +89,10 @@ public class KPIController : ControllerBase
                     .Where(w => w.ExecutionTime.HasValue)
                     .Average(w => w.ExecutionTime!.Value / 60.0), // Convert seconds to minutes
                 AutomationsByType = webAutomations
-                    .GroupBy(w => w.AutomationType)
+                    .GroupBy(w => GetJobTypeName(w.JobTypeId))
                     .ToDictionary(g => g.Key, g => g.Count()),
                 AutomationsByStatus = webAutomations
-                    .GroupBy(w => w.Status)
+                    .GroupBy(w => GetStatusName(w.StatusId))
                     .ToDictionary(g => g.Key, g => g.Count()),
                 RecentTrends = CalculateWebAutomationTrends(webAutomations)
             };
@@ -114,9 +114,9 @@ public class KPIController : ControllerBase
             var jobSchedules = await _jobScheduleRepository.GetAllAsync();
             var totalJobs = jobSchedules.Count();
             var enabledJobs = jobSchedules.Count(j => j.IsEnabled);
-            var scheduledJobs = jobSchedules.Count(j => j.Status == "Scheduled");
-            var runningJobs = jobSchedules.Count(j => j.Status == "Running");
-            var completedJobs = jobSchedules.Count(j => j.Status == "Completed");
+            var scheduledJobs = jobSchedules.Count(j => j.StatusId == 1); // Pending (scheduled)
+            var runningJobs = jobSchedules.Count(j => j.StatusId == 2); // Running
+            var completedJobs = jobSchedules.Count(j => j.StatusId == 3); // Completed
 
             var kpis = new JobSchedulingKPIs
             {
@@ -127,10 +127,10 @@ public class KPIController : ControllerBase
                 CompletedJobs = completedJobs,
                 SuccessRate = totalJobs > 0 ? Math.Round((double)completedJobs / totalJobs * 100, 2) : 0,
                 JobsByType = jobSchedules
-                    .GroupBy(j => j.JobType)
+                    .GroupBy(j => GetJobTypeName(j.JobTypeId))
                     .ToDictionary(g => g.Key, g => g.Count()),
                 JobsByStatus = jobSchedules
-                    .GroupBy(j => j.Status)
+                    .GroupBy(j => GetStatusName(j.StatusId))
                     .ToDictionary(g => g.Key, g => g.Count()),
                 JobsByPriority = jobSchedules
                     .GroupBy(j => j.Priority)
@@ -160,12 +160,12 @@ public class KPIController : ControllerBase
             {
                 SystemUptime = 99.9, // Mock uptime percentage
                 TotalAutomationTasks = testExecutions.Count() + webAutomations.Count() + jobSchedules.Count(),
-                SuccessfulTasks = testExecutions.Count(t => t.Status == "Passed") +
-                                 webAutomations.Count(w => w.Status == "Completed") +
-                                 jobSchedules.Count(j => j.Status == "Completed"),
-                FailedTasks = testExecutions.Count(t => t.Status == "Failed") +
-                             webAutomations.Count(w => w.Status == "Failed") +
-                             jobSchedules.Count(j => j.Status == "Failed"),
+                SuccessfulTasks = testExecutions.Count(t => t.StatusId == 3) + // Completed (passed)
+                                 webAutomations.Count(w => w.StatusId == 3) + // Completed
+                                 jobSchedules.Count(j => j.StatusId == 3), // Completed
+                FailedTasks = testExecutions.Count(t => t.StatusId == 4) + // Failed
+                             webAutomations.Count(w => w.StatusId == 4) + // Failed
+                             jobSchedules.Count(j => j.StatusId == 4), // Failed
                 AverageResponseTime = 150, // Mock response time in ms
                 ThroughputPerHour = 25, // Mock throughput
                 ErrorRate = 2.5, // Mock error rate percentage
@@ -233,6 +233,47 @@ public class KPIController : ControllerBase
             { "reliability", "high" },
             { "efficiency", "optimized" },
             { "scalability", "good" }
+        };
+    }
+
+    private string GetStatusName(int statusId)
+    {
+        return statusId switch
+        {
+            1 => "Pending",
+            2 => "Running",
+            3 => "Completed", 
+            4 => "Failed",
+            5 => "Cancelled",
+            _ => "Unknown"
+        };
+    }
+
+    private string GetTestTypeName(int testTypeId)
+    {
+        return testTypeId switch
+        {
+            1 => "Unit",
+            2 => "Integration",
+            3 => "E2E", 
+            4 => "Performance",
+            5 => "Security",
+            6 => "UI",
+            _ => "Unknown"
+        };
+    }
+
+    private string GetJobTypeName(int jobTypeId)
+    {
+        return jobTypeId switch
+        {
+            1 => "Data Processing",
+            2 => "Report Generation",
+            3 => "System Maintenance",
+            4 => "Backup",
+            5 => "Web Scraping",
+            6 => "API Testing",
+            _ => "Unknown"
         };
     }
 }

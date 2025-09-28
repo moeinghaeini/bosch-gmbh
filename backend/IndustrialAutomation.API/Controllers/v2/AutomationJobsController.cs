@@ -48,10 +48,10 @@ public class AutomationJobsController : ControllerBase
             
             // Apply filters
             if (!string.IsNullOrEmpty(status))
-                jobs = jobs.Where(j => j.Status == status);
+                jobs = jobs.Where(j => GetStatusName(j.StatusId) == status);
             
             if (!string.IsNullOrEmpty(jobType))
-                jobs = jobs.Where(j => j.JobType == jobType);
+                jobs = jobs.Where(j => GetJobTypeName(j.JobTypeId) == jobType);
             
             if (!string.IsNullOrEmpty(search))
                 jobs = jobs.Where(j => j.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
@@ -67,8 +67,8 @@ public class AutomationJobsController : ControllerBase
             jobs = sortBy.ToLower() switch
             {
                 "name" => sortOrder.ToLower() == "asc" ? jobs.OrderBy(j => j.Name) : jobs.OrderByDescending(j => j.Name),
-                "status" => sortOrder.ToLower() == "asc" ? jobs.OrderBy(j => j.Status) : jobs.OrderByDescending(j => j.Status),
-                "jobtype" => sortOrder.ToLower() == "asc" ? jobs.OrderBy(j => j.JobType) : jobs.OrderByDescending(j => j.JobType),
+                "status" => sortOrder.ToLower() == "asc" ? jobs.OrderBy(j => GetStatusName(j.StatusId)) : jobs.OrderByDescending(j => GetStatusName(j.StatusId)),
+                "jobtype" => sortOrder.ToLower() == "asc" ? jobs.OrderBy(j => GetJobTypeName(j.JobTypeId)) : jobs.OrderByDescending(j => GetJobTypeName(j.JobTypeId)),
                 _ => sortOrder.ToLower() == "asc" ? jobs.OrderBy(j => j.CreatedAt) : jobs.OrderByDescending(j => j.CreatedAt)
             };
             
@@ -115,8 +115,8 @@ public class AutomationJobsController : ControllerBase
                 Id = job.Id,
                 Name = job.Name,
                 Description = job.Description,
-                Status = job.Status,
-                JobType = job.JobType,
+                Status = GetStatusName(job.StatusId),
+                JobTypeId = job.JobTypeId,
                 Configuration = job.Configuration,
                 ErrorMessage = job.ErrorMessage,
                 ScheduledAt = job.ScheduledAt,
@@ -157,8 +157,8 @@ public class AutomationJobsController : ControllerBase
             {
                 Name = request.Name,
                 Description = request.Description,
-                JobType = request.JobType,
-                Status = "Pending",
+                JobTypeId = request.JobTypeId,
+                StatusId = 1, // Pending
                 Configuration = request.Configuration,
                 ScheduledAt = request.ScheduledAt,
                 CreatedAt = DateTime.UtcNow
@@ -169,7 +169,7 @@ public class AutomationJobsController : ControllerBase
             await _monitoringService.RecordEventAsync("automation_job_created", new Dictionary<string, object>
             {
                 ["job_id"] = createdJob.Id,
-                ["job_type"] = createdJob.JobType,
+                ["job_type"] = GetJobTypeName(createdJob.JobTypeId),
                 ["user_id"] = GetCurrentUserId()
             });
 
@@ -202,7 +202,7 @@ public class AutomationJobsController : ControllerBase
 
             job.Name = request.Name;
             job.Description = request.Description;
-            job.JobType = request.JobType;
+            job.JobTypeId = request.JobTypeId;
             job.Configuration = request.Configuration;
             job.ScheduledAt = request.ScheduledAt;
             job.UpdatedAt = DateTime.UtcNow;
@@ -270,18 +270,18 @@ public class AutomationJobsController : ControllerBase
             var statistics = new AutomationJobStatistics
             {
                 TotalJobs = jobs.Count(),
-                CompletedJobs = jobs.Count(j => j.Status == "Completed"),
-                FailedJobs = jobs.Count(j => j.Status == "Failed"),
-                RunningJobs = jobs.Count(j => j.Status == "Running"),
-                PendingJobs = jobs.Count(j => j.Status == "Pending"),
-                SuccessRate = jobs.Any() ? (double)jobs.Count(j => j.Status == "Completed") / jobs.Count() * 100 : 0,
+                CompletedJobs = jobs.Count(j => j.StatusId == 3), // Completed
+                FailedJobs = jobs.Count(j => j.StatusId == 4), // Failed
+                RunningJobs = jobs.Count(j => j.StatusId == 2), // Running
+                PendingJobs = jobs.Count(j => j.StatusId == 1), // Pending
+                SuccessRate = jobs.Any() ? (double)jobs.Count(j => j.StatusId == 3) / jobs.Count() * 100 : 0,
                 AverageExecutionTime = jobs.Where(j => j.CompletedAt.HasValue && j.StartedAt.HasValue)
                     .Select(j => (j.CompletedAt.Value - j.StartedAt.Value).TotalMinutes)
                     .DefaultIfEmpty(0)
                     .Average(),
-                JobsByType = jobs.GroupBy(j => j.JobType)
+                JobsByType = jobs.GroupBy(j => GetJobTypeName(j.JobTypeId))
                     .ToDictionary(g => g.Key, g => g.Count()),
-                JobsByStatus = jobs.GroupBy(j => j.Status)
+                JobsByStatus = jobs.GroupBy(j => GetStatusName(j.StatusId))
                     .ToDictionary(g => g.Key, g => g.Count())
             };
 
@@ -307,10 +307,10 @@ public class AutomationJobsController : ControllerBase
             if (job == null)
                 return NotFound(new { message = $"Automation job with ID {id} not found" });
 
-            if (job.Status != "Pending")
+            if (job.StatusId != 1) // Not Pending
                 return BadRequest(new { message = "Job can only be executed if it's in Pending status" });
 
-            job.Status = "Running";
+            job.StatusId = 2; // Running
             job.StartedAt = DateTime.UtcNow;
             job.UpdatedAt = DateTime.UtcNow;
             
@@ -337,6 +337,33 @@ public class AutomationJobsController : ControllerBase
         var userIdClaim = User.FindFirst("user_id")?.Value;
         return int.TryParse(userIdClaim, out var userId) ? userId : 0;
     }
+
+    private string GetStatusName(int statusId)
+    {
+        return statusId switch
+        {
+            1 => "Pending",
+            2 => "Running",
+            3 => "Completed", 
+            4 => "Failed",
+            5 => "Cancelled",
+            _ => "Unknown"
+        };
+    }
+
+    private string GetJobTypeName(int jobTypeId)
+    {
+        return jobTypeId switch
+        {
+            1 => "Data Processing",
+            2 => "Report Generation",
+            3 => "System Maintenance",
+            4 => "Backup",
+            5 => "Web Scraping",
+            6 => "API Testing",
+            _ => "Unknown"
+        };
+    }
 }
 
 public class PagedResult<T>
@@ -354,7 +381,7 @@ public class AutomationJobDetail
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
-    public string JobType { get; set; } = string.Empty;
+    public int JobTypeId { get; set; } = 1;
     public string Configuration { get; set; } = string.Empty;
     public string? ErrorMessage { get; set; }
     public DateTime? ScheduledAt { get; set; }
@@ -370,7 +397,7 @@ public class CreateAutomationJobRequest
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string JobType { get; set; } = string.Empty;
+    public int JobTypeId { get; set; } = 1;
     public string Configuration { get; set; } = string.Empty;
     public DateTime? ScheduledAt { get; set; }
 }
@@ -379,7 +406,7 @@ public class UpdateAutomationJobRequest
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string JobType { get; set; } = string.Empty;
+    public int JobTypeId { get; set; } = 1;
     public string Configuration { get; set; } = string.Empty;
     public DateTime? ScheduledAt { get; set; }
 }

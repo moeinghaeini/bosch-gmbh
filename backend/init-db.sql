@@ -25,6 +25,32 @@ BEGIN
     END
 END
 
+-- Create StatusTypes table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='StatusTypes' AND xtype='U')
+BEGIN
+    CREATE TABLE StatusTypes (
+        Id int IDENTITY(1,1) PRIMARY KEY,
+        Name nvarchar(50) NOT NULL UNIQUE,
+        Description nvarchar(200) NULL,
+        IsActive bit NOT NULL DEFAULT 1,
+        CreatedAt datetime2 NOT NULL,
+        UpdatedAt datetime2 NULL
+    );
+END
+
+-- Create JobTypes table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='JobTypes' AND xtype='U')
+BEGIN
+    CREATE TABLE JobTypes (
+        Id int IDENTITY(1,1) PRIMARY KEY,
+        Name nvarchar(100) NOT NULL UNIQUE,
+        Description nvarchar(200) NULL,
+        IsActive bit NOT NULL DEFAULT 1,
+        CreatedAt datetime2 NOT NULL,
+        UpdatedAt datetime2 NULL
+    );
+END
+
 -- Create AutomationJobs table
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AutomationJobs' AND xtype='U')
 BEGIN
@@ -32,15 +58,25 @@ BEGIN
         Id int IDENTITY(1,1) PRIMARY KEY,
         Name nvarchar(200) NOT NULL,
         Description nvarchar(1000) NULL,
-        Status nvarchar(50) NOT NULL,
-        JobType nvarchar(100) NOT NULL,
+        StatusId int NOT NULL,
+        JobTypeId int NOT NULL,
         Configuration nvarchar(max) NULL,
         ErrorMessage nvarchar(2000) NULL,
+        ExecutionTimeMs int NULL,
+        RetryCount int NOT NULL DEFAULT 0,
+        MaxRetries int NOT NULL DEFAULT 3,
+        Priority int NOT NULL DEFAULT 0,
+        CreatedBy int NULL,
+        AssignedTo int NULL,
         ScheduledAt datetime2 NULL,
         StartedAt datetime2 NULL,
         CompletedAt datetime2 NULL,
         CreatedAt datetime2 NOT NULL,
-        UpdatedAt datetime2 NULL
+        UpdatedAt datetime2 NULL,
+        FOREIGN KEY (StatusId) REFERENCES StatusTypes(Id),
+        FOREIGN KEY (JobTypeId) REFERENCES JobTypes(Id),
+        FOREIGN KEY (CreatedBy) REFERENCES Users(Id),
+        FOREIGN KEY (AssignedTo) REFERENCES Users(Id)
     );
 END
 ELSE
@@ -60,14 +96,27 @@ BEGIN
     END
 END
 
+-- Create TestTypes table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='TestTypes' AND xtype='U')
+BEGIN
+    CREATE TABLE TestTypes (
+        Id int IDENTITY(1,1) PRIMARY KEY,
+        Name nvarchar(50) NOT NULL UNIQUE,
+        Description nvarchar(200) NULL,
+        IsActive bit NOT NULL DEFAULT 1,
+        CreatedAt datetime2 NOT NULL,
+        UpdatedAt datetime2 NULL
+    );
+END
+
 -- Create TestExecutions table
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='TestExecutions' AND xtype='U')
 BEGIN
     CREATE TABLE TestExecutions (
         Id int IDENTITY(1,1) PRIMARY KEY,
         TestName nvarchar(200) NOT NULL,
-        TestType nvarchar(50) NOT NULL,
-        Status nvarchar(50) NOT NULL,
+        TestTypeId int NOT NULL,
+        StatusId int NOT NULL,
         TestSuite nvarchar(200) NOT NULL,
         TestData nvarchar(max) NULL,
         ExpectedResult nvarchar(max) NULL,
@@ -75,11 +124,18 @@ BEGIN
         ErrorMessage nvarchar(2000) NULL,
         AIAnalysis nvarchar(max) NULL,
         ConfidenceScore nvarchar(10) NULL,
+        ExecutionTimeMs int NULL,
+        CreatedBy int NULL,
+        ExecutedBy int NULL,
         TestEnvironment nvarchar(100) NULL,
         Browser nvarchar(50) NULL,
         Device nvarchar(50) NULL,
         CreatedAt datetime2 NOT NULL,
-        UpdatedAt datetime2 NULL
+        UpdatedAt datetime2 NULL,
+        FOREIGN KEY (TestTypeId) REFERENCES TestTypes(Id),
+        FOREIGN KEY (StatusId) REFERENCES StatusTypes(Id),
+        FOREIGN KEY (CreatedBy) REFERENCES Users(Id),
+        FOREIGN KEY (ExecutedBy) REFERENCES Users(Id)
     );
 END
 
@@ -90,8 +146,8 @@ BEGIN
         Id int IDENTITY(1,1) PRIMARY KEY,
         AutomationName nvarchar(200) NOT NULL,
         WebsiteUrl nvarchar(500) NOT NULL,
-        Status nvarchar(50) NOT NULL,
-        AutomationType nvarchar(100) NOT NULL,
+        StatusId int NOT NULL,
+        JobTypeId int NOT NULL,
         TargetElement nvarchar(500) NULL,
         Action nvarchar(100) NULL,
         InputData nvarchar(max) NULL,
@@ -100,13 +156,18 @@ BEGIN
         AIResponse nvarchar(max) NULL,
         ElementSelector nvarchar(1000) NULL,
         ErrorMessage nvarchar(2000) NULL,
+        ExecutionTimeMs int NULL,
+        CreatedBy int NULL,
         Browser nvarchar(50) NULL,
         Device nvarchar(50) NULL,
         UserAgent nvarchar(500) NULL,
         ViewportSize nvarchar(20) NULL,
         ConfidenceScore nvarchar(10) NULL,
         CreatedAt datetime2 NOT NULL,
-        UpdatedAt datetime2 NULL
+        UpdatedAt datetime2 NULL,
+        FOREIGN KEY (StatusId) REFERENCES StatusTypes(Id),
+        FOREIGN KEY (JobTypeId) REFERENCES JobTypes(Id),
+        FOREIGN KEY (CreatedBy) REFERENCES Users(Id)
     );
 END
 
@@ -116,8 +177,8 @@ BEGIN
     CREATE TABLE JobSchedules (
         Id int IDENTITY(1,1) PRIMARY KEY,
         JobName nvarchar(200) NOT NULL,
-        JobType nvarchar(100) NOT NULL,
-        Status nvarchar(50) NOT NULL,
+        JobTypeId int NOT NULL,
+        StatusId int NOT NULL,
         CronExpression nvarchar(100) NULL,
         Configuration nvarchar(max) NULL,
         Priority nvarchar(20) NOT NULL,
@@ -130,7 +191,9 @@ BEGIN
         Notifications nvarchar(max) NULL,
         Dependencies nvarchar(max) NULL,
         CreatedAt datetime2 NOT NULL,
-        UpdatedAt datetime2 NULL
+        UpdatedAt datetime2 NULL,
+        FOREIGN KEY (JobTypeId) REFERENCES JobTypes(Id),
+        FOREIGN KEY (StatusId) REFERENCES StatusTypes(Id)
     );
 END
 
@@ -209,6 +272,43 @@ BEGIN
     );
 END
 
+-- Insert lookup data
+-- StatusTypes
+IF NOT EXISTS (SELECT * FROM StatusTypes WHERE Name = 'Pending')
+BEGIN
+    INSERT INTO StatusTypes (Name, Description, IsActive, CreatedAt)
+    VALUES 
+    ('Pending', 'Job is waiting to be executed', 1, GETUTCDATE()),
+    ('Running', 'Job is currently executing', 1, GETUTCDATE()),
+    ('Completed', 'Job has finished successfully', 1, GETUTCDATE()),
+    ('Failed', 'Job has failed with errors', 1, GETUTCDATE()),
+    ('Cancelled', 'Job was cancelled', 1, GETUTCDATE());
+END
+
+-- JobTypes
+IF NOT EXISTS (SELECT * FROM JobTypes WHERE Name = 'WebAutomation')
+BEGIN
+    INSERT INTO JobTypes (Name, Description, IsActive, CreatedAt)
+    VALUES 
+    ('WebAutomation', 'Web browser automation tasks', 1, GETUTCDATE()),
+    ('APITest', 'API testing and validation', 1, GETUTCDATE()),
+    ('DataProcessing', 'Data processing and analysis', 1, GETUTCDATE()),
+    ('ReportGeneration', 'Automated report generation', 1, GETUTCDATE()),
+    ('SystemMaintenance', 'System maintenance tasks', 1, GETUTCDATE());
+END
+
+-- TestTypes
+IF NOT EXISTS (SELECT * FROM TestTypes WHERE Name = 'Functional')
+BEGIN
+    INSERT INTO TestTypes (Name, Description, IsActive, CreatedAt)
+    VALUES 
+    ('Functional', 'Functional testing', 1, GETUTCDATE()),
+    ('Integration', 'Integration testing', 1, GETUTCDATE()),
+    ('Performance', 'Performance testing', 1, GETUTCDATE()),
+    ('Security', 'Security testing', 1, GETUTCDATE()),
+    ('Regression', 'Regression testing', 1, GETUTCDATE());
+END
+
 -- Insert sample data
 IF NOT EXISTS (SELECT * FROM Users WHERE Username = 'admin')
 BEGIN
@@ -219,41 +319,41 @@ END
 -- Insert sample automation jobs
 IF NOT EXISTS (SELECT * FROM AutomationJobs WHERE Name = 'Sample Automation Job')
 BEGIN
-    INSERT INTO AutomationJobs (Name, Description, Status, JobType, Configuration, CreatedAt)
+    INSERT INTO AutomationJobs (Name, Description, StatusId, JobTypeId, Configuration, CreatedAt)
     VALUES 
-    ('Sample Automation Job', 'A sample automation job for testing', 'Pending', 'WebAutomation', '{"browser": "Chrome", "timeout": 30}', GETUTCDATE()),
-    ('Data Processing Job', 'Process customer data files', 'Running', 'DataProcessing', '{"inputPath": "/data/input", "outputPath": "/data/output"}', GETUTCDATE()),
-    ('Report Generation', 'Generate monthly reports', 'Completed', 'ReportGeneration', '{"template": "monthly", "format": "PDF"}', GETUTCDATE());
+    ('Sample Automation Job', 'A sample automation job for testing', 1, 1, '{"browser": "Chrome", "timeout": 30}', GETUTCDATE()),
+    ('Data Processing Job', 'Process customer data files', 2, 3, '{"inputPath": "/data/input", "outputPath": "/data/output"}', GETUTCDATE()),
+    ('Report Generation', 'Generate monthly reports', 3, 4, '{"template": "monthly", "format": "PDF"}', GETUTCDATE());
 END
 
 -- Insert sample test executions
 IF NOT EXISTS (SELECT * FROM TestExecutions WHERE TestName = 'Login Test')
 BEGIN
-    INSERT INTO TestExecutions (TestName, TestType, Status, TestSuite, TestData, ExpectedResult, TestEnvironment, Browser, Device, CreatedAt)
+    INSERT INTO TestExecutions (TestName, TestTypeId, StatusId, TestSuite, TestData, ExpectedResult, TestEnvironment, Browser, Device, CreatedAt)
     VALUES 
-    ('Login Test', 'Functional', 'Passed', 'Authentication Suite', '{"username": "testuser", "password": "testpass"}', 'User successfully logged in', 'Test', 'Chrome', 'Desktop', GETUTCDATE()),
-    ('API Test', 'Integration', 'Failed', 'API Suite', '{"endpoint": "/api/users", "method": "GET"}', 'Status 200', 'Test', 'Chrome', 'Desktop', GETUTCDATE()),
-    ('UI Test', 'UI', 'Passed', 'UI Suite', '{"page": "dashboard", "element": "header"}', 'Header element visible', 'Test', 'Chrome', 'Desktop', GETUTCDATE());
+    ('Login Test', 1, 3, 'Authentication Suite', '{"username": "testuser", "password": "testpass"}', 'User successfully logged in', 'Test', 'Chrome', 'Desktop', GETUTCDATE()),
+    ('API Test', 2, 4, 'API Suite', '{"endpoint": "/api/users", "method": "GET"}', 'Status 200', 'Test', 'Chrome', 'Desktop', GETUTCDATE()),
+    ('UI Test', 1, 3, 'UI Suite', '{"page": "dashboard", "element": "header"}', 'Header element visible', 'Test', 'Chrome', 'Desktop', GETUTCDATE());
 END
 
 -- Insert sample web automations
 IF NOT EXISTS (SELECT * FROM WebAutomations WHERE AutomationName = 'Login Automation')
 BEGIN
-    INSERT INTO WebAutomations (AutomationName, WebsiteUrl, Status, AutomationType, TargetElement, Action, InputData, Browser, Device, CreatedAt)
+    INSERT INTO WebAutomations (AutomationName, WebsiteUrl, StatusId, JobTypeId, TargetElement, Action, InputData, Browser, Device, CreatedAt)
     VALUES 
-    ('Login Automation', 'https://example.com', 'Completed', 'Login', 'input[type="email"]', 'Fill', '{"email": "test@example.com"}', 'Chrome', 'Desktop', GETUTCDATE()),
-    ('Data Extraction', 'https://data.example.com', 'Running', 'DataExtraction', '.data-table', 'Extract', '{"format": "JSON"}', 'Chrome', 'Desktop', GETUTCDATE()),
-    ('Form Submission', 'https://forms.example.com', 'Pending', 'FormSubmission', 'form', 'Submit', '{"name": "John Doe", "email": "john@example.com"}', 'Chrome', 'Desktop', GETUTCDATE());
+    ('Login Automation', 'https://example.com', 3, 1, 'input[type="email"]', 'Fill', '{"email": "test@example.com"}', 'Chrome', 'Desktop', GETUTCDATE()),
+    ('Data Extraction', 'https://data.example.com', 2, 1, '.data-table', 'Extract', '{"format": "JSON"}', 'Chrome', 'Desktop', GETUTCDATE()),
+    ('Form Submission', 'https://forms.example.com', 1, 1, 'form', 'Submit', '{"name": "John Doe", "email": "john@example.com"}', 'Chrome', 'Desktop', GETUTCDATE());
 END
 
 -- Insert sample job schedules
 IF NOT EXISTS (SELECT * FROM JobSchedules WHERE JobName = 'Daily Report')
 BEGIN
-    INSERT INTO JobSchedules (JobName, JobType, Status, CronExpression, Priority, IsEnabled, NextRunTime, CreatedAt)
+    INSERT INTO JobSchedules (JobName, JobTypeId, StatusId, CronExpression, Priority, IsEnabled, NextRunTime, CreatedAt)
     VALUES 
-    ('Daily Report', 'ReportGeneration', 'Active', '0 9 * * *', 'High', 1, DATEADD(day, 1, GETUTCDATE()), GETUTCDATE()),
-    ('Weekly Cleanup', 'Maintenance', 'Active', '0 2 * * 0', 'Medium', 1, DATEADD(week, 1, GETUTCDATE()), GETUTCDATE()),
-    ('Monthly Backup', 'Backup', 'Active', '0 1 1 * *', 'High', 1, DATEADD(month, 1, GETUTCDATE()), GETUTCDATE());
+    ('Daily Report', 4, 1, '0 9 * * *', 'High', 1, DATEADD(day, 1, GETUTCDATE()), GETUTCDATE()),
+    ('Weekly Cleanup', 5, 1, '0 2 * * 0', 'Medium', 1, DATEADD(week, 1, GETUTCDATE()), GETUTCDATE()),
+    ('Monthly Backup', 4, 1, '0 1 1 * *', 'High', 1, DATEADD(month, 1, GETUTCDATE()), GETUTCDATE());
 END
 
 PRINT 'Database initialization completed successfully!';

@@ -3,8 +3,8 @@ namespace IndustrialAutomation.Core.Entities;
 public class JobSchedule : BaseEntity
 {
     public string JobName { get; set; } = string.Empty;
-    public string JobType { get; set; } = string.Empty; // TestExecution, WebAutomation, DataProcessing
-    public string Status { get; set; } = "Scheduled"; // Scheduled, Running, Completed, Failed, Cancelled
+    public int JobTypeId { get; set; } = 1; // Foreign key to job type lookup
+    public int StatusId { get; set; } = 1; // Foreign key to status lookup
     public string CronExpression { get; set; } = string.Empty;
     public DateTime? NextRunTime { get; set; }
     public DateTime? LastRunTime { get; set; }

@@ -112,7 +112,8 @@ public class RateLimitingMiddleware
         // Cache the updated list
         var cacheOptions = new MemoryCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(_options.WindowSeconds + 1)
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(_options.WindowSeconds + 1),
+            Size = requests.Count
         };
         
         _cache.Set(key, requests, cacheOptions);

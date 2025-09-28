@@ -106,32 +106,32 @@ public class TestExecutionsController : ControllerBase
         }
     }
 
-    [HttpGet("status/{status}")]
-    public async Task<ActionResult<IEnumerable<TestExecution>>> GetTestExecutionsByStatus(string status)
+    [HttpGet("status/{statusId}")]
+    public async Task<ActionResult<IEnumerable<TestExecution>>> GetTestExecutionsByStatus(int statusId)
     {
         try
         {
-            var testExecutions = await _testExecutionRepository.GetByStatusAsync(status);
+            var testExecutions = await _testExecutionRepository.GetByStatusAsync(statusId);
             return Ok(testExecutions);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving test executions by status {Status}", status);
+            _logger.LogError(ex, "Error retrieving test executions by status {StatusId}", statusId);
             return StatusCode(500, "Internal server error");
         }
     }
 
-    [HttpGet("type/{testType}")]
-    public async Task<ActionResult<IEnumerable<TestExecution>>> GetTestExecutionsByType(string testType)
+    [HttpGet("type/{testTypeId}")]
+    public async Task<ActionResult<IEnumerable<TestExecution>>> GetTestExecutionsByType(int testTypeId)
     {
         try
         {
-            var testExecutions = await _testExecutionRepository.GetByTestTypeAsync(testType);
+            var testExecutions = await _testExecutionRepository.GetByTestTypeAsync(testTypeId);
             return Ok(testExecutions);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving test executions by type {TestType}", testType);
+            _logger.LogError(ex, "Error retrieving test executions by type {TestTypeId}", testTypeId);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -175,9 +175,11 @@ public class TestExecutionsController : ControllerBase
             if (testExecution == null)
                 return NotFound();
 
+            // Get test type name from ID
+            var testTypeName = GetTestTypeName(testExecution.TestTypeId);
             var analysis = await _aiService.AnalyzeTestResultsAsync(
                 testExecution.ActualResult, 
-                testExecution.TestType);
+                testTypeName);
 
             testExecution.AIAnalysis = analysis;
             await _testExecutionRepository.UpdateAsync(testExecution);
@@ -196,9 +198,11 @@ public class TestExecutionsController : ControllerBase
     {
         try
         {
+            // Get test type name from ID
+            var testTypeName = GetTestTypeName(request.TestTypeId);
             var testCases = await _aiService.GenerateTestCasesAsync(
                 request.Requirements, 
-                request.TestType);
+                testTypeName);
 
             return Ok(testCases);
         }
@@ -223,12 +227,26 @@ public class TestExecutionsController : ControllerBase
             return StatusCode(500, "Internal server error");
         }
     }
+
+    private string GetTestTypeName(int testTypeId)
+    {
+        return testTypeId switch
+        {
+            1 => "Unit",
+            2 => "Integration", 
+            3 => "E2E",
+            4 => "Performance",
+            5 => "Security",
+            6 => "UI",
+            _ => "Unknown"
+        };
+    }
 }
 
 public class GenerateTestCasesRequest
 {
     public string Requirements { get; set; } = string.Empty;
-    public string TestType { get; set; } = string.Empty;
+    public int TestTypeId { get; set; } = 1;
 }
 
 public class OptimizeTestSuiteRequest
