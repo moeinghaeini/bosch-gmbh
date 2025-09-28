@@ -43,4 +43,34 @@ public interface IAIService
     Task<List<Dictionary<string, object>>> DetectWebElementsAsync(byte[] screenshot);
     Task<string> OCRTextFromImageAsync(byte[] imageData);
     Task<Dictionary<string, object>> CompareImagesAsync(byte[] image1, byte[] image2);
+    Task<List<Dictionary<string, object>>> DetectButtonsAsync(byte[] screenshot);
+    Task<List<Dictionary<string, object>>> DetectInputFieldsAsync(byte[] screenshot);
+    Task<List<Dictionary<string, object>>> DetectLinksAsync(byte[] screenshot);
+    Task<Dictionary<string, object>> AnalyzeElementAccessibilityAsync(byte[] screenshot, string elementDescription);
+    Task<string> GenerateElementSelectorAsync(byte[] screenshot, string elementDescription);
+    Task<bool> ValidateElementVisibilityAsync(byte[] screenshot, string selector);
+    Task<Dictionary<string, object>> ExtractElementAttributesAsync(byte[] screenshot, string elementDescription);
+
+    // Experimental Analysis methods
+    Task<string> RunExperimentalAnalysisAsync(string analysisType, string configuration);
+    Task<Dictionary<string, object>> AnalyzeTestExecutionPerformanceAsync(string testData);
+    Task<Dictionary<string, object>> AnalyzeWebAutomationPerformanceAsync(string automationData);
+    Task<Dictionary<string, object>> GenerateStatisticalReportAsync(string data, string analysisType);
+    Task<List<Dictionary<string, object>>> CompareAIModelsAsync(List<string> modelNames, string testData);
+    Task<Dictionary<string, object>> CalculateKPIsAsync(string data, string kpiType);
+    Task<string> GeneratePerformanceReportAsync(string benchmarkData);
+    Task<Dictionary<string, object>> AnalyzeFailurePatternsAsync(string failureData);
+    Task<Dictionary<string, object>> PredictSystemPerformanceAsync(string historicalData);
+    Task<string> GenerateRecommendationsAsync(string analysisResults);
+
+    // Advanced ML Model Management
+    Task<bool> TrainCustomModelAsync(string modelType, string trainingData, string configuration);
+    Task<Dictionary<string, object>> EvaluateModelPerformanceAsync(string modelName, string testData);
+    Task<bool> DeployModelToProductionAsync(string modelName, string version);
+    Task<Dictionary<string, object>> GetModelPerformanceMetricsAsync(string modelName);
+    Task<List<string>> GetAvailableModelVersionsAsync(string modelName);
+    Task<bool> RollbackModelVersionAsync(string modelName, string targetVersion);
+    Task<Dictionary<string, object>> CompareModelVersionsAsync(string modelName, string version1, string version2);
+    Task<string> GenerateModelDocumentationAsync(string modelName);
+    Task<Dictionary<string, object>> AnalyzeModelDriftAsync(string modelName, string newData);
 }

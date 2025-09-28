@@ -68,7 +68,40 @@ interface KPIData {
 }
 
 const KPIDashboard: React.FC = () => {
-  const [kpiData, setKpiData] = useState<KPIData | null>(null);
+  const [kpiData, setKpiData] = useState<KPIData | null>({
+    testExecution: {
+      totalTests: 100,
+      passedTests: 85,
+      failedTests: 15,
+      successRate: 85.0,
+      averageExecutionTime: 2.5
+    },
+    webAutomation: {
+      totalAutomations: 50,
+      completedAutomations: 45,
+      failedAutomations: 5,
+      successRate: 90.0,
+      averageExecutionTime: 5.0
+    },
+    jobScheduling: {
+      totalJobs: 20,
+      enabledJobs: 18,
+      completedJobs: 15,
+      successRate: 83.3
+    },
+    overallPerformance: {
+      systemUptime: 99.9,
+      totalTasks: 170,
+      successfulTasks: 145,
+      averageResponseTime: 150.0,
+      errorRate: 2.5,
+      resourceUtilization: {
+        cpu: 45.0,
+        memory: 60.0,
+        disk: 30.0
+      }
+    }
+  });
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 

@@ -129,6 +129,14 @@ builder.Services.AddAutoMapper(typeof(Program));
 // Add Infrastructure services
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// Add new services
+builder.Services.AddScoped<IApiGatewayService, ApiGatewayService>();
+builder.Services.AddScoped<IMLOpsService, MLOpsService>();
+builder.Services.AddScoped<IWorkflowEngineService, WorkflowEngineService>();
+builder.Services.AddScoped<IIndustry4IntegrationService, Industry4IntegrationService>();
+builder.Services.AddScoped<IAPMService, APMService>();
+builder.Services.AddScoped<IEnhancedCacheService, EnhancedCacheService>();
+
 // Add Authentication services
 builder.Services.AddScoped<IAuthService, AuthService>();
 
@@ -186,8 +194,11 @@ app.UseResponseCompression();
 // Add Custom Middleware
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
+app.UseMiddleware<InputValidationMiddleware>();
 app.UseMiddleware<RateLimitingMiddleware>();
 app.UseMiddleware<SecurityHeadersMiddleware>();
+app.UseMiddleware<AuditLoggingMiddleware>();
+app.UseMiddleware<JwtAuthenticationMiddleware>();
 
 // Add Request Logging
 app.UseSerilogRequestLogging();

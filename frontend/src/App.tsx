@@ -32,6 +32,8 @@ import TestExecutions from './components/TestExecutions';
 import WebAutomations from './components/WebAutomations';
 import JobSchedules from './components/JobSchedules';
 import PerformanceMonitor from './components/PerformanceMonitor';
+import AIAnalysis from './components/AIAnalysis';
+import ComputerVision from './components/ComputerVision';
 import Navigation from './components/Navigation';
 import Loading from './components/Loading';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -212,6 +214,8 @@ function App() {
                     <Route path="/web-automations" element={<WebAutomations />} />
                     <Route path="/job-schedules" element={<JobSchedules />} />
                     <Route path="/performance" element={<PerformanceMonitor />} />
+                    <Route path="/ai-analysis" element={<AIAnalysis />} />
+                    <Route path="/computer-vision" element={<ComputerVision />} />
                   </Routes>
                 </Box>
               </Fade>

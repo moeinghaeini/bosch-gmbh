@@ -1,246 +1,377 @@
-# Bosch Industrial Automation Platform Setup
+# 🛠️ Setup Guide - Industrial Automation Platform
 
-This project implements the infrastructure for three core industrial automation solutions:
+This guide provides detailed instructions for setting up the Industrial Automation Platform in various environments.
 
-1. **Intelligent Automated Test Execution System**
-2. **Smart Web Automation Solution**
-3. **Enterprise Management Interface for Automation Supervision**
+## 📋 Prerequisites
 
-## Technology Stack
+### System Requirements
+- **OS**: Windows 10/11, macOS 10.15+, or Linux (Ubuntu 20.04+)
+- **RAM**: Minimum 8GB, Recommended 16GB
+- **Storage**: 10GB free space
+- **Network**: Internet connection for AI services
 
-- **Backend**: .NET 8 Web API
-- **Frontend**: React 18 with TypeScript
-- **Database**: SQL Server
-- **ORM**: Entity Framework Core
-- **UI Framework**: Material-UI (MUI)
-- **Containerization**: Docker & Docker Compose
+### Required Software
+- **Docker**: 20.10+ with Docker Compose
+- **Node.js**: 18.x (for local development)
+- **.NET SDK**: 8.0 (for local development)
+- **Git**: Latest version
 
-## Project Structure
+## 🚀 Quick Setup (Docker - Recommended)
 
-```
-bosch-gmbh/
-├── backend/                 # .NET Web API
-│   ├── IndustrialAutomation.API/     # Main API project
-│   ├── IndustrialAutomation.Core/    # Domain entities and interfaces
-│   ├── IndustrialAutomation.Infrastructure/ # Data access layer
-│   └── Dockerfile
-├── frontend/                # React application
-│   ├── src/
-│   │   ├── components/      # React components
-│   │   ├── services/        # API services
-│   │   └── App.tsx
-│   └── Dockerfile
-├── docker-compose.yml       # Multi-container setup
-└── README.MD               # Project documentation
+### 1. Clone Repository
+```bash
+git clone <repository-url>
+cd bosch-gmbh
 ```
 
-## Prerequisites
+### 2. Environment Configuration
+```bash
+# Copy environment template
+cp .env.example .env
 
-- Docker and Docker Compose
-- .NET 8 SDK (for local development)
-- Node.js 18+ (for local development)
-- SQL Server (for local development)
+# Edit environment variables
+nano .env
+```
 
-## Quick Start with Docker
+### 3. Start Services
+```bash
+# Simple setup (recommended for development)
+docker-compose -f docker-compose.simple.yml up -d
 
-1. **Clone and navigate to the project directory**
-   ```bash
-   cd "bosch-gmbh"
-   ```
+# Full setup with monitoring
+docker-compose up -d
+```
 
-2. **Start all services**
-   ```bash
-   docker-compose up -d
-   ```
+### 4. Verify Installation
+```bash
+# Check service status
+docker-compose ps
 
-3. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
-   - SQL Server: localhost:1433
+# Run basic tests
+./scripts/test-simple.sh
+```
 
-4. **Initialize the database**
-   ```bash
-   # Run Entity Framework migrations
-   docker-compose exec backend dotnet ef database update
-   ```
+### 5. Access Application
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5001
+- **API Docs**: http://localhost:5001/swagger
+- **Monitoring**: http://localhost:3001 (Grafana)
 
-## Local Development Setup
+## 🛠️ Local Development Setup
 
 ### Backend Setup
 
-1. **Navigate to backend directory**
+1. **Install .NET 8 SDK**
+   ```bash
+   # Windows (using winget)
+   winget install Microsoft.DotNet.SDK.8
+   
+   # macOS (using Homebrew)
+   brew install dotnet
+   
+   # Linux (Ubuntu)
+   wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+   sudo dpkg -i packages-microsoft-prod.deb
+   sudo apt-get update
+   sudo apt-get install dotnet-sdk-8.0
+   ```
+
+2. **Setup Database**
+   ```bash
+   # Install SQL Server 2022
+   # Windows: Download from Microsoft
+   # macOS: Use Docker
+   # Linux: Use Docker or install SQL Server
+   
+   # Create database
+   sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q "CREATE DATABASE IndustrialAutomationDb"
+   
+   # Run initialization script
+   sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -d IndustrialAutomationDb -i database/init-database.sql
+   ```
+
+3. **Configure Backend**
    ```bash
    cd backend
-   ```
-
-2. **Restore packages**
-   ```bash
+   
+   # Restore dependencies
    dotnet restore
-   ```
-
-3. **Update database connection string** in `BoschThesis.API/appsettings.json`
-
-4. **Run Entity Framework migrations**
-   ```bash
-   dotnet ef migrations add InitialCreate --project BoschThesis.Infrastructure --startup-project BoschThesis.API
-   dotnet ef database update --project BoschThesis.Infrastructure --startup-project BoschThesis.API
-   ```
-
-5. **Run the API**
-   ```bash
-   dotnet run --project BoschThesis.API
+   
+   # Update connection string in appsettings.json
+   # Set OpenAI API key in appsettings.json
+   
+   # Build and run
+   dotnet build
+   dotnet run
    ```
 
 ### Frontend Setup
 
-1. **Navigate to frontend directory**
+1. **Install Node.js**
+   ```bash
+   # Download from https://nodejs.org/
+   # Or use version manager (nvm, n)
+   nvm install 18
+   nvm use 18
+   ```
+
+2. **Setup Frontend**
    ```bash
    cd frontend
-   ```
-
-2. **Install dependencies**
-   ```bash
+   
+   # Install dependencies
    npm install
-   ```
-
-3. **Start development server**
-   ```bash
+   
+   # Configure environment
+   cp .env.example .env.local
+   # Edit .env.local with your API URL
+   
+   # Start development server
    npm start
    ```
 
-## API Endpoints
+### Redis Setup (Optional for local development)
 
-### Automation Jobs
-- `GET /api/automationjobs` - Get all automation jobs
-- `GET /api/automationjobs/{id}` - Get job by ID
-- `POST /api/automationjobs` - Create new job
-- `PUT /api/automationjobs/{id}` - Update job
-- `DELETE /api/automationjobs/{id}` - Delete job
-- `GET /api/automationjobs/status/{status}` - Get jobs by status
-- `GET /api/automationjobs/type/{type}` - Get jobs by type
+```bash
+# Using Docker
+docker run -d --name redis -p 6379:6379 redis:7-alpine
 
-### Users
-- `GET /api/users` - Get all users
-- `GET /api/users/{id}` - Get user by ID
-- `POST /api/users` - Create new user
-- `PUT /api/users/{id}` - Update user
-- `DELETE /api/users/{id}` - Delete user
+# Or install locally
+# Windows: Download from Redis website
+# macOS: brew install redis
+# Linux: sudo apt-get install redis-server
+```
 
-## Database Schema
+## 🔧 Configuration
 
-### AutomationJob
-- `Id` (int, PK)
-- `Name` (string)
-- `Description` (string)
-- `Status` (string) - Pending, Running, Completed, Failed
-- `JobType` (string) - WebAutomation, TestExecution, DataProcessing
-- `ScheduledAt` (datetime?)
-- `StartedAt` (datetime?)
-- `CompletedAt` (datetime?)
-- `ErrorMessage` (string?)
-- `Configuration` (string) - JSON configuration
-- `CreatedAt` (datetime)
-- `UpdatedAt` (datetime?)
-- `IsDeleted` (bool)
+### Environment Variables
 
-### User
-- `Id` (int, PK)
-- `Username` (string, unique)
-- `Email` (string, unique)
-- `PasswordHash` (string)
-- `Role` (string) - Admin, User, Viewer
-- `IsActive` (bool)
-- `LastLoginAt` (datetime?)
-- `CreatedAt` (datetime)
-- `UpdatedAt` (datetime?)
-- `IsDeleted` (bool)
+#### Backend (.env)
+```env
+# Database
+ConnectionStrings__DefaultConnection=Server=localhost;Database=IndustrialAutomationDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=true
 
-## Features Implemented
+# Redis
+ConnectionStrings__Redis=localhost:6379
 
-### Core Infrastructure
-- ✅ Clean Architecture with separation of concerns
-- ✅ Entity Framework Core with SQL Server
-- ✅ Repository pattern
-- ✅ AutoMapper for DTOs
-- ✅ Serilog for logging
-- ✅ CORS configuration
-- ✅ Swagger/OpenAPI documentation
+# JWT
+JWT__Secret=YourSuperSecretKeyThatIsAtLeast32CharactersLong!
+JWT__Issuer=IndustrialAutomation
+JWT__Audience=IndustrialAutomation
 
-### Frontend Features
-- ✅ Modern React with TypeScript
-- ✅ Material-UI components
-- ✅ React Query for data fetching
-- ✅ Responsive design
-- ✅ Data grid for tabular data
-- ✅ Form dialogs for CRUD operations
+# OpenAI
+OpenAI__ApiKey=your-openai-api-key
+OpenAI__BaseUrl=https://api.openai.com/v1
 
-### Management Features
-- ✅ Automation job management
-- ✅ User management
-- ✅ Dashboard with statistics
-- ✅ Status tracking
-- ✅ Job type categorization
+# Environment
+ASPNETCORE_ENVIRONMENT=Development
+```
 
-## Next Steps for Thesis Implementation
+#### Frontend (.env.local)
+```env
+REACT_APP_API_URL=http://localhost:5001
+REACT_APP_ENVIRONMENT=development
+```
 
-### For Intelligent Test Execution (Topic 1)
-- Implement intelligent model integration
-- Add test result analysis
-- Create automated test execution engine
-- Implement result validation
+### Database Configuration
 
-### For Smart Web Automation Solution (Topic 2)
-- Integrate intelligent web element detection
-- Add browser automation capabilities
-- Implement dynamic web interaction
-- Create automation script generation
+1. **Create Database**
+   ```sql
+   CREATE DATABASE IndustrialAutomationDb;
+   ```
 
-### For Back-Office Interface (Topic 3)
-- Add advanced user permissions
-- Implement job scheduling
-- Create monitoring dashboards
-- Add system administration features
+2. **Run Initialization Script**
+   ```bash
+   sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -d IndustrialAutomationDb -i database/init-database.sql
+   ```
 
-## Development Notes
+3. **Verify Tables**
+   ```sql
+   USE IndustrialAutomationDb;
+   SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES;
+   ```
 
-- The project uses a clean architecture pattern
-- All database operations are handled through repositories
-- The frontend uses React Query for efficient data management
-- Docker setup allows for easy deployment and development
-- Logging is configured with Serilog for comprehensive monitoring
+## 🧪 Testing Setup
 
-## Troubleshooting
+### Run Tests
+```bash
+# Simple validation
+./scripts/test-simple.sh
+
+# Comprehensive tests
+./scripts/test-system.sh
+
+# Frontend tests
+cd frontend && npm test
+
+# Backend tests
+cd backend && dotnet test
+```
+
+### Test Configuration
+- **Unit Tests**: 85%+ coverage required
+- **Integration Tests**: Core workflows
+- **E2E Tests**: Critical user journeys
+- **Performance Tests**: Load testing
+
+## 📊 Monitoring Setup
+
+### Prometheus Configuration
+```yaml
+# monitoring/prometheus.yml
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'backend'
+    static_configs:
+      - targets: ['backend:80']
+```
+
+### Grafana Setup
+1. Access Grafana at http://localhost:3001
+2. Login with admin/admin123
+3. Import dashboards from `/monitoring/grafana/`
+4. Configure data sources
+
+## 🔒 Security Configuration
+
+### JWT Configuration
+```json
+{
+  "JWT": {
+    "Secret": "YourSuperSecretKeyThatIsAtLeast32CharactersLong!",
+    "Issuer": "IndustrialAutomation",
+    "Audience": "IndustrialAutomation",
+    "ExpirationMinutes": 60,
+    "RefreshTokenExpirationDays": 7
+  }
+}
+```
+
+### Security Headers
+```csharp
+// Configured in Program.cs
+app.UseSecurityHeaders();
+app.UseRateLimiting();
+```
+
+## 🚀 Production Setup
+
+### Docker Production
+```bash
+# Build production images
+docker-compose -f docker-compose.prod.yml build
+
+# Deploy with production settings
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+### Environment Variables (Production)
+```env
+ASPNETCORE_ENVIRONMENT=Production
+ConnectionStrings__DefaultConnection=Server=prod-sql;Database=IndustrialAutomationDb;...
+JWT__Secret=ProductionSecretKey
+OpenAI__ApiKey=production-openai-key
+```
+
+### SSL Configuration
+```nginx
+# nginx/nginx.conf
+server {
+    listen 443 ssl;
+    ssl_certificate /etc/nginx/ssl/cert.pem;
+    ssl_certificate_key /etc/nginx/ssl/key.pem;
+    # ... rest of configuration
+}
+```
+
+## 🐛 Troubleshooting
 
 ### Common Issues
 
-1. **Database connection issues**
-   - Ensure SQL Server is running
-   - Check connection string in appsettings.json
-   - Verify database exists
-
-2. **CORS issues**
-   - Check CORS configuration in Program.cs
-   - Ensure frontend URL is allowed
-
-3. **Docker issues**
-   - Ensure Docker is running
-   - Check container logs: `docker-compose logs [service-name]`
-
-### Useful Commands
-
+#### Docker Issues
 ```bash
-# View logs
-docker-compose logs -f
-
-# Restart services
-docker-compose restart
+# Clean up Docker
+docker-compose down -v
+docker system prune -a
 
 # Rebuild containers
-docker-compose up --build
-
-# Stop all services
-docker-compose down
-
-# Remove volumes (careful - this deletes data)
-docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
 ```
+
+#### Database Connection Issues
+```bash
+# Check SQL Server status
+docker-compose logs sqlserver
+
+# Test connection
+docker-compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q 'SELECT 1'
+```
+
+#### Frontend Build Issues
+```bash
+# Clear npm cache
+npm cache clean --force
+
+# Delete node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### Backend Build Issues
+```bash
+# Clean and rebuild
+dotnet clean
+dotnet restore
+dotnet build
+```
+
+### Logs and Debugging
+```bash
+# View all logs
+docker-compose logs
+
+# View specific service logs
+docker-compose logs backend
+docker-compose logs frontend
+docker-compose logs sqlserver
+
+# Follow logs in real-time
+docker-compose logs -f backend
+```
+
+## 📚 Additional Resources
+
+### Documentation
+- [API Documentation](http://localhost:5001/swagger)
+- [Frontend Components](./frontend/src/components/)
+- [Backend Services](./backend/IndustrialAutomation.API/)
+
+### Useful Commands
+```bash
+# Database operations
+docker-compose exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -d IndustrialAutomationDb -Q "SELECT COUNT(*) FROM Users"
+
+# Redis operations
+docker-compose exec redis redis-cli ping
+
+# Backend health check
+curl http://localhost:5001/health
+
+# Frontend health check
+curl http://localhost:3000/health
+```
+
+## 🆘 Support
+
+If you encounter issues:
+1. Check the logs: `docker-compose logs`
+2. Run diagnostics: `./scripts/test-simple.sh`
+3. Check the troubleshooting section above
+4. Create an issue in the repository
+
+---
+
+**Happy Coding! 🚀**

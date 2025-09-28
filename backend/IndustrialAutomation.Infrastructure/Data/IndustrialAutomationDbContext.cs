@@ -23,6 +23,10 @@ public class IndustrialAutomationDbContext : DbContext
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<PerformanceMetric> PerformanceMetrics { get; set; }
         public DbSet<SystemLog> SystemLogs { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<Tenant> Tenants { get; set; }
+        public DbSet<TenantUser> TenantUsers { get; set; }
+        public DbSet<TenantResource> TenantResources { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -36,10 +40,14 @@ public class IndustrialAutomationDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(1000);
             entity.Property(e => e.StatusId).IsRequired();
             entity.Property(e => e.JobTypeId).IsRequired();
-            entity.Property(e => e.Configuration).HasColumnType("nvarchar(max)");
-            entity.Property(e => e.ErrorMessage).HasMaxLength(2000);
-            entity.Property(e => e.CreatedBy).HasMaxLength(100);
-            entity.Property(e => e.AssignedTo).HasMaxLength(100);
+            entity.Property(e => e.Configuration).HasColumnType("nvarchar(max)").IsRequired(false);
+            entity.Property(e => e.ErrorMessage).HasMaxLength(2000).IsRequired(false);
+            entity.Property(e => e.CreatedBy).HasMaxLength(100).IsRequired(false);
+            entity.Property(e => e.AssignedTo).HasMaxLength(100).IsRequired(false);
+            entity.Property(e => e.ExecutionTimeMs).IsRequired(false);
+            entity.Property(e => e.ScheduledAt).IsRequired(false);
+            entity.Property(e => e.StartedAt).IsRequired(false);
+            entity.Property(e => e.CompletedAt).IsRequired(false);
         });
 
         // Configure User
@@ -50,6 +58,10 @@ public class IndustrialAutomationDbContext : DbContext
             entity.Property(e => e.Email).IsRequired().HasMaxLength(200);
             entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(500);
             entity.Property(e => e.Role).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired(false);
+            entity.Property(e => e.IsDeleted).IsRequired();
             
             entity.HasIndex(e => e.Username).IsUnique();
             entity.HasIndex(e => e.Email).IsUnique();

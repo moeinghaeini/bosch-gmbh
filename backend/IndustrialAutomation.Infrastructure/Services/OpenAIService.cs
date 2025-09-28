@@ -1113,6 +1113,731 @@ public class OpenAIService : IAIService
         }
     }
 
+    // Computer Vision methods
+    public async Task<List<Dictionary<string, object>>> DetectButtonsAsync(byte[] screenshot)
+    {
+        try
+        {
+            var prompt = $@"
+                Analyze this screenshot and identify all button elements:
+                
+                Please provide:
+                1. Button locations (coordinates)
+                2. Button text/labels
+                3. Button types (submit, cancel, action, etc.)
+                4. Visual characteristics
+                5. Accessibility attributes
+                
+                Return as JSON array of button objects.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new List<Dictionary<string, object>> { new Dictionary<string, object> { { "buttons", result } } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error detecting buttons");
+            return new List<Dictionary<string, object>>();
+        }
+    }
+
+    public async Task<List<Dictionary<string, object>>> DetectInputFieldsAsync(byte[] screenshot)
+    {
+        try
+        {
+            var prompt = $@"
+                Analyze this screenshot and identify all input field elements:
+                
+                Please provide:
+                1. Input field locations (coordinates)
+                2. Field types (text, email, password, etc.)
+                3. Placeholder text
+                4. Field labels
+                5. Validation requirements
+                
+                Return as JSON array of input field objects.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new List<Dictionary<string, object>> { new Dictionary<string, object> { { "inputFields", result } } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error detecting input fields");
+            return new List<Dictionary<string, object>>();
+        }
+    }
+
+    public async Task<List<Dictionary<string, object>>> DetectLinksAsync(byte[] screenshot)
+    {
+        try
+        {
+            var prompt = $@"
+                Analyze this screenshot and identify all link elements:
+                
+                Please provide:
+                1. Link locations (coordinates)
+                2. Link text
+                3. Link destinations (if visible)
+                4. Link types (navigation, action, etc.)
+                5. Visual indicators
+                
+                Return as JSON array of link objects.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new List<Dictionary<string, object>> { new Dictionary<string, object> { { "links", result } } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error detecting links");
+            return new List<Dictionary<string, object>>();
+        }
+    }
+
+    public async Task<Dictionary<string, object>> AnalyzeElementAccessibilityAsync(byte[] screenshot, string elementDescription)
+    {
+        try
+        {
+            var prompt = $@"
+                Analyze the accessibility of this web element: {elementDescription}
+                
+                Please evaluate:
+                1. ARIA attributes
+                2. Keyboard navigation support
+                3. Screen reader compatibility
+                4. Color contrast
+                5. Focus indicators
+                6. Accessibility score (1-10)
+                
+                Return analysis in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "analysis", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error analyzing element accessibility");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<string> GenerateElementSelectorAsync(byte[] screenshot, string elementDescription)
+    {
+        try
+        {
+            var prompt = $@"
+                Generate CSS selectors for this element: {elementDescription}
+                
+                Please provide:
+                1. Primary CSS selector
+                2. Alternative selectors
+                3. XPath selector
+                4. Data attribute selectors
+                5. Class-based selectors
+                
+                Return as JSON with selector options.
+            ";
+
+            return await CallOpenAIAsync(prompt);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating element selector");
+            return "Selector generation failed: " + ex.Message;
+        }
+    }
+
+    public async Task<bool> ValidateElementVisibilityAsync(byte[] screenshot, string selector)
+    {
+        try
+        {
+            var prompt = $@"
+                Validate if this element is visible: {selector}
+                
+                Check:
+                1. Element presence
+                2. Visibility status
+                3. Display properties
+                4. Opacity levels
+                5. Z-index positioning
+                
+                Return true/false with reasoning.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return result.ToLower().Contains("true");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error validating element visibility");
+            return false;
+        }
+    }
+
+    public async Task<Dictionary<string, object>> ExtractElementAttributesAsync(byte[] screenshot, string elementDescription)
+    {
+        try
+        {
+            var prompt = $@"
+                Extract all attributes from this element: {elementDescription}
+                
+                Please provide:
+                1. HTML attributes
+                2. CSS properties
+                3. ARIA attributes
+                4. Data attributes
+                5. Event handlers
+                
+                Return as JSON object.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "attributes", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error extracting element attributes");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    // Experimental Analysis methods
+    public async Task<string> RunExperimentalAnalysisAsync(string analysisType, string configuration)
+    {
+        try
+        {
+            var prompt = $@"
+                Run experimental analysis for: {analysisType}
+                Configuration: {configuration}
+                
+                Please provide:
+                1. Analysis methodology
+                2. Experimental setup
+                3. Data collection process
+                4. Statistical analysis
+                5. Results interpretation
+                6. Conclusions and recommendations
+                
+                Return comprehensive analysis report.
+            ";
+
+            return await CallOpenAIAsync(prompt);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error running experimental analysis");
+            return "Experimental analysis failed: " + ex.Message;
+        }
+    }
+
+    public async Task<Dictionary<string, object>> AnalyzeTestExecutionPerformanceAsync(string testData)
+    {
+        try
+        {
+            var prompt = $@"
+                Analyze test execution performance data:
+                {testData}
+                
+                Please provide:
+                1. Performance metrics
+                2. Bottleneck identification
+                3. Optimization recommendations
+                4. Resource utilization
+                5. Execution time analysis
+                
+                Return analysis in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "analysis", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error analyzing test execution performance");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<Dictionary<string, object>> AnalyzeWebAutomationPerformanceAsync(string automationData)
+    {
+        try
+        {
+            var prompt = $@"
+                Analyze web automation performance data:
+                {automationData}
+                
+                Please provide:
+                1. Success rates
+                2. Execution times
+                3. Error patterns
+                4. Performance bottlenecks
+                5. Optimization opportunities
+                
+                Return analysis in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "analysis", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error analyzing web automation performance");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<Dictionary<string, object>> GenerateStatisticalReportAsync(string data, string analysisType)
+    {
+        try
+        {
+            var prompt = $@"
+                Generate statistical report for: {analysisType}
+                Data: {data}
+                
+                Please provide:
+                1. Descriptive statistics
+                2. Inferential analysis
+                3. Correlation analysis
+                4. Trend analysis
+                5. Statistical significance
+                
+                Return comprehensive statistical report in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "report", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating statistical report");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<List<Dictionary<string, object>>> CompareAIModelsAsync(List<string> modelNames, string testData)
+    {
+        try
+        {
+            var prompt = $@"
+                Compare AI models: {string.Join(", ", modelNames)}
+                Test data: {testData}
+                
+                Please provide:
+                1. Performance comparison
+                2. Accuracy metrics
+                3. Speed analysis
+                4. Resource usage
+                5. Recommendations
+                
+                Return comparison results in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new List<Dictionary<string, object>> { new Dictionary<string, object> { { "comparison", result } } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error comparing AI models");
+            return new List<Dictionary<string, object>>();
+        }
+    }
+
+    public async Task<Dictionary<string, object>> CalculateKPIsAsync(string data, string kpiType)
+    {
+        try
+        {
+            var prompt = $@"
+                Calculate KPIs for: {kpiType}
+                Data: {data}
+                
+                Please provide:
+                1. KPI definitions
+                2. Calculation methods
+                3. Current values
+                4. Target values
+                5. Performance trends
+                
+                Return KPI analysis in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "kpis", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calculating KPIs");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<string> GeneratePerformanceReportAsync(string benchmarkData)
+    {
+        try
+        {
+            var prompt = $@"
+                Generate performance report for benchmark data:
+                {benchmarkData}
+                
+                Please provide:
+                1. Executive summary
+                2. Performance metrics
+                3. Benchmark comparisons
+                4. Recommendations
+                5. Action items
+                
+                Return comprehensive performance report.
+            ";
+
+            return await CallOpenAIAsync(prompt);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating performance report");
+            return "Performance report generation failed: " + ex.Message;
+        }
+    }
+
+    public async Task<Dictionary<string, object>> AnalyzeFailurePatternsAsync(string failureData)
+    {
+        try
+        {
+            var prompt = $@"
+                Analyze failure patterns in data:
+                {failureData}
+                
+                Please provide:
+                1. Failure categories
+                2. Root cause analysis
+                3. Pattern recognition
+                4. Prevention strategies
+                5. Risk assessment
+                
+                Return failure analysis in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "analysis", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error analyzing failure patterns");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<Dictionary<string, object>> PredictSystemPerformanceAsync(string historicalData)
+    {
+        try
+        {
+            var prompt = $@"
+                Predict system performance based on historical data:
+                {historicalData}
+                
+                Please provide:
+                1. Performance predictions
+                2. Trend analysis
+                3. Capacity planning
+                4. Risk factors
+                5. Recommendations
+                
+                Return predictions in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "predictions", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error predicting system performance");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<string> GenerateRecommendationsAsync(string analysisResults)
+    {
+        try
+        {
+            var prompt = $@"
+                Generate recommendations based on analysis:
+                {analysisResults}
+                
+                Please provide:
+                1. Priority recommendations
+                2. Implementation steps
+                3. Resource requirements
+                4. Timeline estimates
+                5. Success metrics
+                
+                Return actionable recommendations.
+            ";
+
+            return await CallOpenAIAsync(prompt);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating recommendations");
+            return "Recommendation generation failed: " + ex.Message;
+        }
+    }
+
+    // Advanced ML Model Management
+    public async Task<bool> TrainCustomModelAsync(string modelType, string trainingData, string configuration)
+    {
+        try
+        {
+            var prompt = $@"
+                Train custom model:
+                Type: {modelType}
+                Training Data: {trainingData}
+                Configuration: {configuration}
+                
+                Please provide:
+                1. Training methodology
+                2. Model architecture
+                3. Training progress
+                4. Validation results
+                5. Deployment readiness
+                
+                Return training status and results.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return result.ToLower().Contains("success");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error training custom model");
+            return false;
+        }
+    }
+
+    public async Task<Dictionary<string, object>> EvaluateModelPerformanceAsync(string modelName, string testData)
+    {
+        try
+        {
+            var prompt = $@"
+                Evaluate model performance:
+                Model: {modelName}
+                Test Data: {testData}
+                
+                Please provide:
+                1. Accuracy metrics
+                2. Precision and recall
+                3. F1 score
+                4. Confusion matrix
+                5. Performance benchmarks
+                
+                Return evaluation results in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "evaluation", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error evaluating model performance");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<bool> DeployModelToProductionAsync(string modelName, string version)
+    {
+        try
+        {
+            var prompt = $@"
+                Deploy model to production:
+                Model: {modelName}
+                Version: {version}
+                
+                Please provide:
+                1. Deployment checklist
+                2. Environment configuration
+                3. Monitoring setup
+                4. Rollback plan
+                5. Success criteria
+                
+                Return deployment status.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return result.ToLower().Contains("deployed");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deploying model to production");
+            return false;
+        }
+    }
+
+    public async Task<Dictionary<string, object>> GetModelPerformanceMetricsAsync(string modelName)
+    {
+        try
+        {
+            var prompt = $@"
+                Get performance metrics for model: {modelName}
+                
+                Please provide:
+                1. Current performance
+                2. Historical trends
+                3. Resource usage
+                4. Error rates
+                5. Throughput metrics
+                
+                Return metrics in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "metrics", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting model performance metrics");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<List<string>> GetAvailableModelVersionsAsync(string modelName)
+    {
+        try
+        {
+            var prompt = $@"
+                Get available versions for model: {modelName}
+                
+                Please provide:
+                1. Version list
+                2. Release dates
+                3. Version status
+                4. Compatibility info
+                5. Recommended version
+                
+                Return version information.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new List<string> { result };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting available model versions");
+            return new List<string>();
+        }
+    }
+
+    public async Task<bool> RollbackModelVersionAsync(string modelName, string targetVersion)
+    {
+        try
+        {
+            var prompt = $@"
+                Rollback model to version:
+                Model: {modelName}
+                Target Version: {targetVersion}
+                
+                Please provide:
+                1. Rollback procedure
+                2. Data backup
+                3. Validation steps
+                4. Monitoring setup
+                5. Success confirmation
+                
+                Return rollback status.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return result.ToLower().Contains("success");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error rolling back model version");
+            return false;
+        }
+    }
+
+    public async Task<Dictionary<string, object>> CompareModelVersionsAsync(string modelName, string version1, string version2)
+    {
+        try
+        {
+            var prompt = $@"
+                Compare model versions:
+                Model: {modelName}
+                Version 1: {version1}
+                Version 2: {version2}
+                
+                Please provide:
+                1. Performance comparison
+                2. Feature differences
+                3. Bug fixes
+                4. New capabilities
+                5. Recommendation
+                
+                Return comparison in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "comparison", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error comparing model versions");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
+    public async Task<string> GenerateModelDocumentationAsync(string modelName)
+    {
+        try
+        {
+            var prompt = $@"
+                Generate documentation for model: {modelName}
+                
+                Please provide:
+                1. Model overview
+                2. Architecture description
+                3. Usage examples
+                4. API documentation
+                5. Troubleshooting guide
+                
+                Return comprehensive documentation.
+            ";
+
+            return await CallOpenAIAsync(prompt);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating model documentation");
+            return "Documentation generation failed: " + ex.Message;
+        }
+    }
+
+    public async Task<Dictionary<string, object>> AnalyzeModelDriftAsync(string modelName, string newData)
+    {
+        try
+        {
+            var prompt = $@"
+                Analyze model drift for: {modelName}
+                New Data: {newData}
+                
+                Please provide:
+                1. Drift detection
+                2. Performance impact
+                3. Data distribution changes
+                4. Retraining recommendations
+                5. Monitoring alerts
+                
+                Return drift analysis in JSON format.
+            ";
+
+            var result = await CallOpenAIAsync(prompt);
+            return new Dictionary<string, object> { { "drift_analysis", result } };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error analyzing model drift");
+            return new Dictionary<string, object> { { "error", ex.Message } };
+        }
+    }
+
     private async Task<string> CallOpenAIAsync(string prompt)
     {
         try

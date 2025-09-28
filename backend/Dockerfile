@@ -1,4 +1,4 @@
-# Use the official .NET 8 runtime as the base image
+# Use the official .NET 8 runtime as base image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 80
@@ -17,20 +17,26 @@ COPY ["IndustrialAutomation.Tests/IndustrialAutomation.Tests.csproj", "Industria
 # Restore dependencies
 RUN dotnet restore "IndustrialAutomation.API/IndustrialAutomation.API.csproj"
 
-# Copy the rest of the source code
+# Copy all source code
 COPY . .
 
 # Build the application
 WORKDIR "/src/IndustrialAutomation.API"
-RUN dotnet build "IndustrialAutomation.API.csproj" -c Release -o /app/build
+RUN dotnet build "IndustrialAutomation.API.csproj" -c Release --no-restore
 
 # Publish the application
 FROM build AS publish
+WORKDIR "/src/IndustrialAutomation.API"
 RUN dotnet publish "IndustrialAutomation.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Final stage
 FROM base AS final
 WORKDIR /app
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Copy published application
 COPY --from=publish /app/publish .
 
 # Create logs directory
@@ -40,11 +46,8 @@ RUN mkdir -p /app/logs
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:80
 
-# Expose port
-EXPOSE 80
-
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
   CMD curl -f http://localhost/health || exit 1
 
 # Start the application

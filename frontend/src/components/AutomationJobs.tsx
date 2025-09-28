@@ -18,19 +18,19 @@ import {
 } from '@mui/material';
 import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
 import { Add, Edit, Delete } from '@mui/icons-material';
-import { getAutomationJobs, createAutomationJob, updateAutomationJob, deleteAutomationJob } from '../services/mockApi';
+import { getAutomationJobs, createAutomationJob, updateAutomationJob, deleteAutomationJob } from '../services/realApi';
 
 interface AutomationJob {
   id: number;
   name: string;
   description: string;
-  status: string;
-  jobType: string;
+  statusId: number;
+  jobTypeId: number;
   scheduledAt?: string;
   startedAt?: string;
   completedAt?: string;
   errorMessage?: string;
-  configuration: string;
+  configuration?: string;
   createdAt: string;
   updatedAt?: string;
 }
@@ -41,8 +41,8 @@ const AutomationJobs: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    jobType: '',
-    status: 'Pending',
+    jobTypeId: 1,
+    statusId: 1,
     configuration: ''
   });
 
@@ -76,8 +76,8 @@ const AutomationJobs: React.FC = () => {
     setFormData({
       name: '',
       description: '',
-      jobType: '',
-      status: 'Pending',
+      jobTypeId: 1,
+      statusId: 1,
       configuration: ''
     });
     setEditingJob(null);
@@ -93,9 +93,9 @@ const AutomationJobs: React.FC = () => {
     setFormData({
       name: job.name,
       description: job.description,
-      jobType: job.jobType,
-      status: job.status,
-      configuration: job.configuration
+      jobTypeId: job.jobTypeId,
+      statusId: job.statusId,
+      configuration: job.configuration || ''
     });
     setOpen(true);
   };
@@ -118,9 +118,9 @@ const AutomationJobs: React.FC = () => {
     { field: 'id', headerName: 'ID', width: 70 },
     { field: 'name', headerName: 'Name', width: 200 },
     { field: 'description', headerName: 'Description', width: 300 },
-    { field: 'jobType', headerName: 'Type', width: 150 },
-    { field: 'status', headerName: 'Status', width: 120 },
-    { field: 'scheduledAt', headerName: 'Scheduled', width: 150 },
+    { field: 'jobTypeId', headerName: 'Type ID', width: 100 },
+    { field: 'statusId', headerName: 'Status ID', width: 100 },
+    { field: 'createdAt', headerName: 'Created', width: 150 },
     {
       field: 'actions',
       type: 'actions',
@@ -209,24 +209,24 @@ const AutomationJobs: React.FC = () => {
             <FormControl fullWidth margin="normal">
               <InputLabel>Job Type</InputLabel>
               <Select
-                value={formData.jobType}
-                onChange={(e) => setFormData({ ...formData, jobType: e.target.value })}
+                value={formData.jobTypeId}
+                onChange={(e) => setFormData({ ...formData, jobTypeId: Number(e.target.value) })}
               >
-                <MenuItem value="WebAutomation">Web Automation</MenuItem>
-                <MenuItem value="TestExecution">Test Execution</MenuItem>
-                <MenuItem value="DataProcessing">Data Processing</MenuItem>
+                <MenuItem value={1}>Web Automation</MenuItem>
+                <MenuItem value={2}>Test Execution</MenuItem>
+                <MenuItem value={3}>Data Processing</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth margin="normal">
               <InputLabel>Status</InputLabel>
               <Select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                value={formData.statusId}
+                onChange={(e) => setFormData({ ...formData, statusId: Number(e.target.value) })}
               >
-                <MenuItem value="Pending">Pending</MenuItem>
-                <MenuItem value="Running">Running</MenuItem>
-                <MenuItem value="Completed">Completed</MenuItem>
-                <MenuItem value="Failed">Failed</MenuItem>
+                <MenuItem value={1}>Pending</MenuItem>
+                <MenuItem value={2}>Running</MenuItem>
+                <MenuItem value={3}>Completed</MenuItem>
+                <MenuItem value={4}>Failed</MenuItem>
               </Select>
             </FormControl>
             <TextField
