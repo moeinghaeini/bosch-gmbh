@@ -10,9 +10,53 @@
   [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 </div>
 
+## 🎓 **Bosch Italy Internship Competition Project**
+
+> **This is a voluntary application project developed to showcase technical skills and capabilities for the [Bosch Italy Internship for Thesis - Software Engineer](https://jobs.smartrecruiters.com/BoschGroup/744000045118337-internship-for-thesis-software-engineer?trid=dd736706-42ae-4816-b368-5e47859af027) position.**
+
+### 🏢 **About the Bosch Italy Internship**
+
+**Position**: Internship for Thesis - Software Engineer  
+**Location**: Via Monte Aquila, 43124 Parma PR, Italy  
+**Company**: Robert Bosch S.p.a Società Unipersonale  
+**Duration**: Full-time  
+**Compensation**: 700-900 euros (gross)/month depending on education level
+
+#### 🎯 **Thesis Topics Available**
+
+**1. Study on the Use of Advanced Methods (such as AI) for Automated Test Execution**
+- Study and analyze final verification approaches for processing large amounts of data
+- Derive potential automated solutions for efficient and effective validation coverage
+- **Deliverable**: Implementation of an automated system with theoretical and experimental analysis
+
+**2. Study and Development of an AI-Based Web Automation Solution**
+- Develop non-deterministic methods for automating interactions with third-party web pages
+- Create AI-based methods to identify web page elements without exact knowledge of page structure
+- **Deliverable**: Implementation of an automated system capable of interacting with websites based on descriptive prompts
+
+**3. Development of a Web-Based Back-Office Interface for Automation Supervision**
+- Develop an interface for system administration of data processing orchestration
+- Create management interface for automation "jobs" and system permissions
+- **Deliverable**: Implementation of a web interface for managing task orchestrator activities
+
+#### 🛠️ **Required Skills**
+- **Education**: Bachelor's/Master's Degree in Computer Engineering
+- **Languages**: English (min. B2)
+- **Technologies**: .NET, SQL Server, React JS
+
+#### 🌟 **Why This Project Demonstrates Perfect Fit**
+
+This Industrial Automation Platform directly addresses **all three thesis topics**:
+
+1. **✅ AI-Powered Test Execution**: Advanced AI methods for automated test execution with intelligent analysis
+2. **✅ AI-Based Web Automation**: Non-deterministic web automation using AI to identify and interact with page elements
+3. **✅ Web-Based Back-Office Interface**: Comprehensive web interface for automation supervision and management
+
+---
+
 ## 🎯 Overview
 
-A cutting-edge **AI-powered industrial automation platform** developed for Bosch's thesis project, featuring advanced test execution, intelligent web automation, and comprehensive orchestration capabilities. This enterprise-grade solution combines modern web technologies with artificial intelligence to revolutionize industrial automation processes.
+A cutting-edge **AI-powered industrial automation platform** developed to demonstrate advanced capabilities in industrial automation, featuring intelligent test execution, AI-based web automation, and comprehensive orchestration capabilities. This enterprise-grade solution showcases the perfect combination of modern web technologies with artificial intelligence to revolutionize industrial automation processes.
 
 ### 🎉 **LIVE DEMO AVAILABLE**
 
