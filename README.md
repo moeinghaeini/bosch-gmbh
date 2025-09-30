@@ -20,7 +20,6 @@
 **Location**: Via Monte Aquila, 43124 Parma PR, Italy  
 **Company**: Robert Bosch S.p.a Società Unipersonale  
 **Duration**: Full-time  
-**Compensation**: 700-900 euros (gross)/month depending on education level
 
 #### 🎯 **Thesis Topics Available**
 
@@ -39,18 +38,6 @@
 - Create management interface for automation "jobs" and system permissions
 - **Deliverable**: Implementation of a web interface for managing task orchestrator activities
 
-#### 🛠️ **Required Skills**
-- **Education**: Bachelor's/Master's Degree in Computer Engineering
-- **Languages**: English (min. B2)
-- **Technologies**: .NET, SQL Server, React JS
-
-#### 🌟 **Why This Project Demonstrates Perfect Fit**
-
-This Industrial Automation Platform directly addresses **all three thesis topics**:
-
-1. **✅ AI-Powered Test Execution**: Advanced AI methods for automated test execution with intelligent analysis
-2. **✅ AI-Based Web Automation**: Non-deterministic web automation using AI to identify and interact with page elements
-3. **✅ Web-Based Back-Office Interface**: Comprehensive web interface for automation supervision and management
 
 ---
 
