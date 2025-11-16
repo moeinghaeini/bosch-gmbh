@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a comprehensive Industrial Automation Platform designed for modern manufacturing environments, built with a microservices architecture using .NET Core for the backend and React with TypeScript for the frontend. The platform provides a robust foundation for managing automation jobs, monitoring system performance, and integrating with Industry 4.0 standards. The system is containerized using Docker and includes comprehensive monitoring, logging, and security features to meet enterprise-grade requirements.
+This is a Industrial Automation Platform designed for modern manufacturing environments, built with a microservices architecture using .NET Core for the backend and React with TypeScript for the frontend. The platform provides a robust foundation for managing automation jobs, monitoring system performance, and integrating with Industry 4.0 standards. The system is containerized using Docker and includes comprehensive monitoring, logging, and security features to meet enterprise-grade requirements.
 
 ## Core Features
 
